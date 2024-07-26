@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  hackme:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./hackme:/hackme
+    ports:
+      - '8000:8000'
+    depends_on:
+      - mysql
+      - mailpit
+    environment:
+      DJANGO_ENVIRONMENT:
+      SECRET_KEY:
+
+  mysql:
+    image: 'mysql/mysql-server:8.0'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: '${DB_DATABASE}'
+      MYSQL_USER: '${DB_USERNAME}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    ports:
+      - '3306:3306'
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}'
+    ports:
+      - '8080:80'
+
+  mailpit:
+    image: 'axllent/mailpit:latest'
+    ports:
+      - '${FORWARD_MAILPIT_PORT:-1025}:1025'
+      - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
+
+volumes:
+  mysql_data:
