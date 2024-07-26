@@ -1,14 +1,17 @@
-# Use the official Python image from the Docker Hub
-FROM python:3.11.9-slim
+# Stage 1: Install build dependencies
+FROM python:3.9-slim AS build
+
+# Install build tools
+RUN apt-get update \
+  && apt-get install -y gcc \
+  && apt-get clean
+
+# Stage 2: Final image
+FROM python:3.9-slim
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-
-# Install dependencies
-RUN apt-get update \
-  && apt-get install -y gcc libmysqlclient-dev \
-  && apt-get clean
 
 # Set the working directory
 WORKDIR /hackme
