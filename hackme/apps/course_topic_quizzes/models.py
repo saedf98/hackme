@@ -13,8 +13,8 @@ class CourseTopicQuiz(Quiz):
     class Meta:
         db_table = 'course_topic_quizzes'
 
+    def get_default_name(self):
+        return f"{self.course_topic.name} Quiz"
+
     def __str__(self):
         return self.name
-
-    def get_absolute_url(self):
-        return reverse("CourseTopicQuiz_detail", kwargs={"pk": self.pk})

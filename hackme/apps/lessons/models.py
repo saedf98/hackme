@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.utils.text import slugify
 from apps.common.models import LessonFormat, TimeStampedModel
 from apps.courses.models import Course
 
@@ -7,6 +7,7 @@ from apps.courses.models import Course
 # Create your models here.
 class Lesson(TimeStampedModel):
     name = models.CharField(max_length=255)
+    slug = models.SlugField(blank=True, null=True)
     lesson_format = models.CharField(
         max_length=15,
         choices=LessonFormat.choices,
@@ -27,8 +28,10 @@ class Lesson(TimeStampedModel):
         # Don't forget to call the super clean method
         super().clean()
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super(Lesson, self).save(*args, **kwargs)
+
     def __str__(self):
         return self.name
-
-    def get_absolute_url(self):
-        return reverse("Lesson_detail", kwargs={"pk": self.pk})

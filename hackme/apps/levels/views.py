@@ -1,11 +1,11 @@
 from django.urls import reverse_lazy
-from apps.common.views import DahsboardView
+from apps.common.views import DashboardView
 from .models import Level
 from .tables import LevelTable
 
 
 # Create your views here.
-class LevelView(DahsboardView, LevelTable):
+class LevelView(DashboardView, LevelTable):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

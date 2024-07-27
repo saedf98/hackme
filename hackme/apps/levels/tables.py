@@ -11,8 +11,10 @@ class LevelTable(Table):
                   'class': 'custom user-name'}, header_attrs={'search': True}, searchable=False)
     slug = Column(field='slug',  header='Slug',
                   searchable=False, attrs={'class': "user-name"})
-    action = LinkColumn(header='Action', links=[Link(
-        text='Edit', viewname='levels-edit', args=(A('id'),))])
+    action = LinkColumn(header='Action',
+                        links=[Link(text='Edit', viewname='levels:edit', args=(A('id'),)),
+                               Link(text='View', viewname='levels:show', args=(A('id'),))],
+                        delimiter=" | ")
 
     class Meta:
         model = Level
@@ -24,7 +26,6 @@ class LevelTable(Table):
         ]
         search = True
         pagination = True
-        info = True
         info = True
         # ext_button = True
         # ext_button_template = "My btn"

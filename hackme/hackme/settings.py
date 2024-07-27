@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Template shit
+    # Start Template shit
     "apps.dashboards",
     "apps.layouts",
     "apps.pages",
@@ -64,7 +64,7 @@ INSTALLED_APPS = [
     "apps.forms",
     "apps.form_layouts",
     "apps.tables",
-    # Template shit
+    # End Template shit
     'apps.course_quizzes',
     'apps.course_topic_quizzes',
     'apps.course_topics',
@@ -167,9 +167,8 @@ LOGGING = {
     },
 }
 
-# logger = logging.getLogger('django')
-# logger.error(os.environ.get('DB_HOST'))
-# logger.error(os.environ.get('DB_HOST'))
+logger = logging.getLogger('django')
+logger.error(os.environ.get('DB_HOST'))
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -212,6 +211,10 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "src" / "assets",
 ]
+
+MEDIA_URL = 'media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default URL on which Django application runs for specific environment
 BASE_URL = os.environ.get("BASE_URL", default="http://127.0.0.1:8000")

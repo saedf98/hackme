@@ -16,8 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-
+from django.conf.urls.static import static
+from django.conf import settings
 from web_project.views import SystemView
+
+# TODO(toheeb): update all underscores to hyphen
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,14 +28,27 @@ urlpatterns = [
     # Levels urls
     path("", include("apps.levels.urls")),
 
-    # Courses urls
-    # Course Quizzes
-    # Course topics url
-    # Course topics quizzes url
     # Lessons url
+    path("", include("apps.lessons.urls")),
+
+    # Courses urls
+    path("", include("apps.courses.urls")),
+
+    # Course Quizzes
+    path("", include("apps.course_quizzes.urls")),
+
+    # Course topics url
+    path("", include("apps.course_topics.urls")),
+
+    # Course topics quizzes url
+    path("", include("apps.course_topic_quizzes.urls")),
+
     # Lesson quizzes url
     # Lesson notes url
-    #
+    # Exercise url
+    # Digital Forensics url
+    # Encryption Techniques url
+    # Hashing Algorithms url
 
     # Dashboard urls
     path("", include("apps.dashboards.urls")),
@@ -67,6 +83,8 @@ urlpatterns = [
     # Tables urls
     path("", include("apps.tables.urls")),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = SystemView.as_view(
     template_name="pages_misc_error.html", status=404)
