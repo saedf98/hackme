@@ -46,6 +46,14 @@ CONFIG = {
         'edit_title': 'Edit Lesson',
         'show_title': 'Show Lesson'
     },
+    'lesson_quizzes': {
+        'name': 'Lesson Quizzes',
+        'index_title': 'Lesson Quizzes List',
+        'new_title': 'New Lesson Quiz',
+        'create_title': 'Create Lesson Quiz',
+        'edit_title': 'Edit Lesson Quiz',
+        'show_title': 'Show Lesson Quiz'
+    },
     'courses': {
         'name': 'Courses',
         'index_title': 'Courses List',

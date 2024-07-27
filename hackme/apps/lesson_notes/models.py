@@ -13,7 +13,4 @@ class LessonNote(TimeStampedModel):
         db_table = 'lesson_notes'
 
     def __str__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        return reverse("LessonNote_detail", kwargs={"pk": self.pk})
+        return self.lesson.name

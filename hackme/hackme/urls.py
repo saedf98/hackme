@@ -31,6 +31,12 @@ urlpatterns = [
     # Lessons url
     path("", include("apps.lessons.urls")),
 
+    # Lesson quizzes url
+    path("", include("apps.lesson_quizzes.urls")),
+
+    # Lesson notes url
+    path("", include("apps.lesson_notes.urls")),
+
     # Courses urls
     path("", include("apps.courses.urls")),
 
@@ -43,8 +49,6 @@ urlpatterns = [
     # Course topics quizzes url
     path("", include("apps.course_topic_quizzes.urls")),
 
-    # Lesson quizzes url
-    # Lesson notes url
     # Exercise url
     # Digital Forensics url
     # Encryption Techniques url

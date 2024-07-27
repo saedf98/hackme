@@ -251,7 +251,7 @@
       </ul>
     </li>
     <li
-      class="menu-item {% if '/lessons/' in request.path %}active open{% endif %}"
+      class="menu-item {% if '/lessons/' in request.path  or '/lesson_quizzes/' in request.path  %}active open{% endif %}"
     >
       <a href="javascript:void(0);" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons bx bx-book-content"></i>
@@ -279,6 +279,18 @@
           >
             <div class="text-truncate" data-i18n="Add Lesson">
               Add Lesson
+            </div>
+          </a>
+        </li>
+        <li
+          class="menu-item {% if '/lesson_quizzes/create/' in request.path %}active{% endif %}"
+        >
+          <a
+            href="{% url 'lesson_quizzes:create' %}"
+            class="menu-link"
+          >
+            <div class="text-truncate" data-i18n="Add Lesson Quiz">
+              Add Lesson Quiz
             </div>
           </a>
         </li>

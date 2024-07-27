@@ -15,8 +15,8 @@ class LessonQuiz(Quiz):
     class Meta:
         db_table = 'lesson_quizzes'
 
+    def get_default_name(self):
+        return f"{self.lesson.name} Quiz"
+
     def __str__(self):
         return self.name
-
-    def get_absolute_url(self):
-        return reverse("Quiz_detail", kwargs={"pk": self.pk})
