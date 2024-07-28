@@ -46,6 +46,14 @@ CONFIG = {
         'edit_title': 'Edit Lesson',
         'show_title': 'Show Lesson'
     },
+    'lesson_notes': {
+        'name': 'Lesson Notes',
+        'index_title': 'Lesson Notes List',
+        'new_title': 'New Lesson Note',
+        'create_title': 'Create Lesson Note',
+        'edit_title': 'Edit Lesson Note',
+        'show_title': 'Show Lesson Note'
+    },
     'lesson_quizzes': {
         'name': 'Lesson Quizzes',
         'index_title': 'Lesson Quizzes List',
@@ -85,6 +93,38 @@ CONFIG = {
         'create_title': 'Create Course Topic Quiz',
         'edit_title': 'Edit Course Topic Quiz',
         'show_title': 'Show Course Topic Quiz'
+    },
+    'exercises': {
+        'name': 'Exercises',
+        'index_title': 'Exercises List',
+        'new_title': 'New Exercise',
+        'create_title': 'Create Exercise',
+        'edit_title': 'Edit Exercise',
+        'show_title': 'Show Exercise'
+    },
+    'digital_forensics': {
+        'name': 'Digital Forensics',
+        'index_title': 'Digital Forensics List',
+        'new_title': 'New Digital Forensic',
+        'create_title': 'Create Digital Forensic',
+        'edit_title': 'Edit Digital Forensic',
+        'show_title': 'Show Digital Forensic'
+    },
+    'encryption_techniques': {
+        'name': 'Encryption Techniques',
+        'index_title': 'Encryption Techniques List',
+        'new_title': 'New Encryption Technique',
+        'create_title': 'Create Encryption Technique',
+        'edit_title': 'Edit Encryption Technique',
+        'show_title': 'Show Encryption Technique'
+    },
+    'hashing_algorithms': {
+        'name': 'Hashing Algorithms',
+        'index_title': 'Hashing Algorithms List',
+        'new_title': 'New Hashing Algorithm',
+        'create_title': 'Create Hashing Algorithm',
+        'edit_title': 'Edit Hashing Algorithm',
+        'show_title': 'Show Hashing Algorithm'
     },
     'users': {
         'name': 'Users',

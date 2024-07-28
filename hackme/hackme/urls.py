@@ -50,9 +50,16 @@ urlpatterns = [
     path("", include("apps.course_topic_quizzes.urls")),
 
     # Exercise url
+    path("", include("apps.exercises.urls")),
+
     # Digital Forensics url
+    path("", include("apps.digital_forensics.urls")),
+
     # Encryption Techniques url
+    path("", include("apps.encryption_techniques.urls")),
+
     # Hashing Algorithms url
+    path("", include("apps.hashing_algorithms.urls")),
 
     # Dashboard urls
     path("", include("apps.dashboards.urls")),
