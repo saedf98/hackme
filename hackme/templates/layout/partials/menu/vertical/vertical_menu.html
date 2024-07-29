@@ -593,7 +593,7 @@
           class="menu-item {% if '/login/' in request.path %}active{% endif %}"
         >
           <a
-            href="{% url 'auth-login-basic' %}"
+            href="{% url 'auth:login' %}"
             class="menu-link"
             target="_blank"
           >
@@ -604,7 +604,7 @@
           class="menu-item {% if '/register/' in request.path %}active{% endif %}"
         >
           <a
-            href="{% url 'auth-register-basic' %}"
+            href="{% url 'auth:register' %}"
             class="menu-link"
             target="_blank"
           >
@@ -615,7 +615,7 @@
           class="menu-item {% if '/forgot_password/' in request.path %}active{% endif %}"
         >
           <a
-            href="{% url 'auth-forgot-password-basic' %}"
+            href="{% url 'auth:forgot-password' %}"
             class="menu-link"
             target="_blank"
           >

@@ -3,13 +3,31 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}Register - Pages{% endblock %}
+{% block title %}
+  Register
+{% endblock %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/%40form-validation/form-validation.css' %}" />
+{% endblock vendor_css %}
 
 {% block page_css %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static  'vendor/css/pages/page-auth.css' %}">
+<link rel="stylesheet" href="{% static  'vendor/css/pages/page-auth.css' %}" />
 {% endblock page_css %}
 
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/%40form-validation/popular.js' %}"></script>
+<script src="{% static 'vendor/libs/%40form-validation/bootstrap5.js' %}"></script>
+<script src="{% static 'vendor/libs/%40form-validation/auto-focus.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_js %}
+{{ block.super }}
+<script src="{% static  'js/pages-auth.js' %}"></script>
+{% endblock page_js %}
 
 {% block content %}
 <div class="container-xxl">
@@ -31,13 +49,35 @@
           <!-- /Logo -->
           <h4 class="mb-2">Adventure starts here 🚀</h4>
           <p class="mb-4">Make your app management easy and fun!</p>
-
-          <form id="formAuthentication" class="mb-3" action="{% url 'index' %}">
+          {% comment %} {% url 'index' %} {% endcomment %}
+          <form id="formAuthentication" class="mb-3" method="POST" action="{% url 'auth:register' %}">
             {% csrf_token %}
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                    <div {% if message.tags %} class="{{ message.tags }}" {% endif %}
+                      role="alert">
+                      <button type="button" class="btn-close" data-bs-dismiss="alert"
+                        aria-label="Close"
+                      ></button>
+                      <strong>{{ message|escape }}</strong>
+                    </div>
+                    {% endfor %}
+                  </div>
+              {% endif %}
+
             <div class="mb-3">
               <label for="username" class="form-label">Username</label>
               <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" autofocus>
             </div>
+            {% comment %} <div class="mb-3">
+              <label for="firstname" class="form-label">Firstname</label>
+              <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Enter your firstname" autofocus>
+            </div>
+            <div class="mb-3">
+              <label for="lastname" class="form-label">Lastname</label>
+              <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Enter your lastname" autofocus>
+            </div> {% endcomment %}
             <div class="mb-3">
               <label for="email" class="form-label">Email</label>
               <input type="text" class="form-control" id="email" name="email" placeholder="Enter your email">
@@ -46,6 +86,13 @@
               <label class="form-label" for="password">Password</label>
               <div class="input-group input-group-merge">
                 <input type="password" id="password" class="form-control" name="password" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="password" />
+                <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+              </div>
+            </div>
+            <div class="mb-3 form-password-toggle">
+              <label class="form-label" for="password_confirmation">Confirm Password</label>
+              <div class="input-group input-group-merge">
+                <input type="password" id="password_confirmation" class="form-control" name="password_confirmation" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="password" />
                 <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
               </div>
             </div>
@@ -66,7 +113,7 @@
 
           <p class="text-center">
             <span>Already have an account?</span>
-            <a href="{% url 'auth-login-basic' %}">
+            <a href="{% url 'auth:login' %}">
               <span>Sign in instead</span>
             </a>
           </p>

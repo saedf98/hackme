@@ -3,7 +3,7 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}Forgot Password{% endblock %}
+{% block title %}Resend Verification Email{% endblock %}
 
 {% block page_css %}
 {{ block.super }}
@@ -16,7 +16,7 @@
   <div class="authentication-wrapper authentication-basic container-p-y">
     <div class="authentication-inner py-4">
 
-      <!-- Forgot Password -->
+      <!-- Resend Verification Email -->
       <div class="card">
         <div class="card-body">
           <!-- Logo -->
@@ -29,15 +29,29 @@
             </a>
           </div>
           <!-- /Logo -->
-          <h4 class="mb-2">Forgot Password? 🔒</h4>
-          <p class="mb-4">Enter your email and we'll send you instructions to reset your password</p>
-          <form id="formAuthentication" class="mb-3" action="{% url 'index' %}">
+          <h4 class="mb-2">Resend Verification Email? ✉️</h4>
+          <p class="mb-4">Enter your email and we'll send you a verification mail</p>
+          <form id="formAuthentication" class="mb-3" method="POST" action="{% url 'auth:resend_email_verification' %}">
             {% csrf_token %}
+            {% if messages %}
+              <div class="messages">
+                  {% for message in messages %}
+                  <div {% if message.tags %} class="{{ message.tags }}" {% endif %}
+                    role="alert">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                      aria-label="Close"
+                    ></button>
+                    {% comment %} {{ message|escape }} {% endcomment %}
+                    <strong>{{ message }}</strong>
+                  </div>
+                  {% endfor %}
+                </div>
+            {% endif %}
             <div class="mb-3">
               <label for="email" class="form-label">Email</label>
               <input type="text" class="form-control" id="email" name="email" placeholder="Enter your email" autofocus>
             </div>
-            <button class="btn btn-primary d-grid w-100">Send Reset Link</button>
+            <button class="btn btn-primary d-grid w-100">Resend Email</button>
           </form>
           <div class="text-center">
             <a href="{% url 'auth:login' %}" class="d-flex align-items-center justify-content-center">
@@ -47,7 +61,7 @@
           </div>
         </div>
       </div>
-      <!-- /Forgot Password -->
+      <!-- /Resend vVerification Email -->
     </div>
   </div>
 </div>

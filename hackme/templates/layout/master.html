@@ -26,6 +26,9 @@
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon/favicon.ico' %}" />
 
+    <!-- Include Styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+
     <!-- Include the styles partial -->
     {% include "./partials/styles.html" %} {% block vendor_css %} {% endblock vendor_css %}
 
@@ -49,5 +52,36 @@
 
     <!--Page Javascript-->
     {% block page_js %} {% endblock page_js %}
+
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+
+    <script>
+      var notyf = new Notyf({
+          dismissible: true,
+          duration: 4000,
+          position: {
+              x: 'center',
+              y: 'top',
+          },
+      });
+
+      {% for message in messages %}
+          {% if message.level == 25 %}
+              notyf.success('{{ message }}');
+          {% elif message.level == 40 %}
+              notyf.error('{{ message }}');
+              {% elif message.level == 20 %}
+              notyf.open({
+                  type: 'info',
+                  message: '{{ message }}'
+              });
+          {% elif message.level == 30 %}
+              notyf.open({
+                  type: 'warning',
+                  message: '{{ message }}'
+              });
+          {% endif %}
+      {% endfor %}
+    </script>
   </body>
 </html>

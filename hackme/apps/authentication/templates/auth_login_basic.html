@@ -1,7 +1,31 @@
-{% extends layout_path %} {% load static %} {% load i18n %} {% block title
-%}Login - Pages{% endblock %} {% block page_css %} {{ block.super }}
+{% extends layout_path %}
+{% load static %}
+{% load i18n %}
+{% block title %} Login{% endblock %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/%40form-validation/form-validation.css' %}" />
+{% endblock vendor_css %}
+
+{% block page_css %}
+{{ block.super }}
 <link rel="stylesheet" href="{% static  'vendor/css/pages/page-auth.css' %}" />
-{% endblock page_css %} {% block content %}
+{% endblock page_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/%40form-validation/popular.js' %}"></script>
+<script src="{% static 'vendor/libs/%40form-validation/bootstrap5.js' %}"></script>
+<script src="{% static 'vendor/libs/%40form-validation/auto-focus.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_js %}
+{{ block.super }}
+<script src="{% static  'js/pages-auth.js' %}"></script>
+{% endblock page_js %}
+
+{% block content %}
 <div class="container-xxl">
   <div class="authentication-wrapper authentication-basic container-p-y">
     <div class="authentication-inner">
@@ -28,23 +52,37 @@
             Please sign-in to your account and start the adventure
           </p>
 
-          <form id="formAuthentication" class="mb-3" action="{% url 'index' %}">
+          <form id="formLogin" class="mb-3" method="POST" action="{% url 'auth:login' %}">
             {% csrf_token %}
+            {% if messages %}
+              <div class="messages">
+                  {% for message in messages %}
+                  <div {% if message.tags %} class="{{ message.tags }}" {% endif %}
+                    role="alert">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                      aria-label="Close"
+                    ></button>
+                    {% comment %} {{ message|escape }} {% endcomment %}
+                    <strong>{{ message }}</strong>
+                  </div>
+                  {% endfor %}
+                </div>
+            {% endif %}
             <div class="mb-3">
-              <label for="email" class="form-label">Email or Username</label>
+              <label for="username" class="form-label">Username</label>
               <input
                 type="text"
                 class="form-control"
-                id="email"
-                name="email-username"
-                placeholder="Enter your email or username"
+                id="username"
+                name="username"
+                placeholder="Enter your username"
                 autofocus
               />
             </div>
             <div class="mb-3 form-password-toggle">
               <div class="d-flex justify-content-between">
                 <label class="form-label" for="password">Password</label>
-                <a href="{% url 'auth-forgot-password-basic' %}">
+                <a href="{% url 'auth:forgot-password' %}">
                   <small>Forgot Password?</small>
                 </a>
               </div>
@@ -83,7 +121,7 @@
 
           <p class="text-center">
             <span>New on our platform?</span>
-            <a href="{% url 'auth-register-basic' %}">
+            <a href="{% url 'auth:register' %}">
               <span>Create an account</span>
             </a>
           </p>

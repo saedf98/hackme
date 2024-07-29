@@ -61,6 +61,9 @@ urlpatterns = [
     # Hashing Algorithms url
     path("", include("apps.hashing_algorithms.urls")),
 
+    # Auth urls
+    path("", include("apps.authentication.urls")),
+
     # Dashboard urls
     path("", include("apps.dashboards.urls")),
 
@@ -69,9 +72,6 @@ urlpatterns = [
 
     # Pages urls
     path("", include("apps.pages.urls")),
-
-    # Auth urls
-    path("", include("apps.authentication.urls")),
 
     # Card urls
     path("", include("apps.cards.urls")),

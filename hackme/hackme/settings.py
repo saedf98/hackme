@@ -56,7 +56,6 @@ INSTALLED_APPS = [
     "apps.dashboards",
     "apps.layouts",
     "apps.pages",
-    "apps.authentication",
     "apps.cards",
     "apps.ui",
     "apps.extended_ui",
@@ -65,6 +64,7 @@ INSTALLED_APPS = [
     "apps.form_layouts",
     "apps.tables",
     # End Template shit
+    "apps.authentication",
     'apps.course_quizzes',
     'apps.course_topic_quizzes',
     'apps.course_topics',
@@ -146,6 +146,22 @@ DATABASES = {
         'PORT': os.environ.get('DB_PORT', '3306'),
     }
 }
+
+# App name
+APP_NAME = os.environ.get('APP_NAME', 'Hackme')
+
+# Email
+# https://docs.djangoproject.com/en/5.0/ref/settings/#email-backend
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_BACKEND = os.environ.get(
+#     'MAIL_MAILER', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = os.environ.get('MAIL_HOST', 'mailpit')
+EMAIL_PORT = os.environ.get('MAIL_PORT', 1025)
+EMAIL_USE_TLS = False
+EMAIL_HOST_USER = os.environ.get('MAIL_USERNAME', '')
+EMAIL_HOST_PASSWORD = os.environ.get('MAIL_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get('MAIL_FROM_ADDRESS', 'webmaster@localhost')
 
 LOGGING = {
     'version': 1,
