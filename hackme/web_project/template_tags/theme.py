@@ -17,3 +17,10 @@ def get_theme_variables(scope):
 @register.filter(name='get_config')
 def get_config(value):
     return get_config_value(value)
+
+
+@register.filter
+def in_user_group(user, group_name):
+    if user.is_authenticated:
+        return user.groups.filter(name=group_name).exists()
+    return False

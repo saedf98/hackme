@@ -21,7 +21,12 @@ class Course(TimeStampedModel):
         Level,
         on_delete=models.RESTRICT
     )
-    content_type = models.ForeignKey(ContentType, on_delete=models.RESTRICT)
+    content_type = models.ForeignKey(ContentType, on_delete=models.RESTRICT, limit_choices_to={
+        # Replace with actual app labels
+        'app_label__in': ['encryption_techniques', 'hashing_algorithms', 'digital_forensics'],
+        # Replace with actual model names
+        'model__in': ['encryptiontechnique', 'hashingalgorithm', 'digitalforensic'],
+    })
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
@@ -31,7 +36,22 @@ class Course(TimeStampedModel):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
+        if not self.object_id and self.content_type:
+            # Set the object_id to a specific ID based on some logic
+            self.object_id = self.get_default_object_id()
+            print(self.object_id)
         super(Course, self).save(*args, **kwargs)
+
+    def get_default_object_id(self):
+        model_class = self.content_type.model_class()
+        first_object = model_class.objects.first()
+        return first_object.id if first_object else None
 
     def __str__(self):
         return self.name
+
+    def get_content_object(self):
+        if self.content_type and self.object_id:
+            model_class = self.content_type.model_class()
+            return model_class.objects.get(id=self.object_id)
+        return None

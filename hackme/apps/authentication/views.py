@@ -67,7 +67,7 @@ class LoginAuthView(AuthView):
             if user.userprofile.email_verified:
                 login(request, user)
                 # redirect_url = request.GET.get('next', 'home')
-                redirect_url = request.GET.get('next', 'index')
+                redirect_url = request.POST.get('next') or 'index'
             else:
                 messages.error(request, f"Please verify your account <a href='{get_url('auth:resend_email_verification')}'>click here</a> !",
                                extra_tags='alert alert-danger alert-dismissible fade show')
