@@ -1,5 +1,7 @@
-from django.views.generic import TemplateView
+from django.urls import reverse_lazy
 from web_project import TemplateLayout
+from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from web_project.template_helpers.theme import TemplateHelper
 
 
@@ -26,7 +28,10 @@ class BlankView(TemplateView):
         return context
 
 
-class DashboardView(TemplateView):
+class DashboardView(LoginRequiredMixin, TemplateView):
+    # login_url = '/auth/login'
+    login_url = reverse_lazy('auth:login')
+
     # Predefined function
     def get_context_data(self, **kwargs):
         # A function to init the global layout. It is defined in web_project/__init__.py file

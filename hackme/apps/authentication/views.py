@@ -40,17 +40,20 @@ class AuthView(TemplateView):
             messages.success(
                 request, 'Email Verified Successfully.',
                 extra_tags='alert alert-success alert-dismissible fade show')
+            redirect_url = 'dashboard'
         except UserProfile.DoesNotExist:
             messages.error(
                 request, 'Invalid verification, please try again.',
                 extra_tags='alert alert-danger alert-dismissible fade show')
+            redirect_url = 'auth:login'
 
-        return redirect(reverse("auth:login"))
+        return redirect(reverse(redirect_url))
 
     @login_required()
-    def logout_user(self, request):
-        logout(request)
-        return redirect('home')
+    def logout_user(request):
+        if request.method == "POST":
+            logout(request)
+            return redirect('auth:login')
 
 
 class LoginAuthView(AuthView):

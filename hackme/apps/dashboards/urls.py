@@ -7,5 +7,10 @@ urlpatterns = [
         "",
         DashboardsView.as_view(template_name="dashboard_analytics.html"),
         name="index",
+    ),
+    path(
+        "",
+        DashboardsView.as_view(template_name="dashboard_analytics.html"),
+        name="dashboard",
     )
 ]
