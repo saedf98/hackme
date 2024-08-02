@@ -36,9 +36,15 @@ if not SECRET_KEY:
                          for i in range(32))
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = os.environ.get("DEBUG", default=False)
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '0.0.0.0:8000',
+    '[::1]',
+]
 
 # Current DJANGO_ENVIRONMENT
 ENVIRONMENT = os.environ.get("DJANGO_ENVIRONMENT", default="local")

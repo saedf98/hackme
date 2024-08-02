@@ -32,6 +32,11 @@ class AuthView(TemplateView):
 
         return context
 
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('dashboard')
+        return super().get(request, *args, **kwargs)
+
     def verify_email(request, token):
         try:
             profile = UserProfile.objects.get(verification_token=token)
@@ -107,13 +112,15 @@ class RegisterAuthView(AuthView):
         if check1 or check2 or check3:
             messages.error(
                 request, "Registration Failed!", extra_tags='alert alert-danger alert-dismissible fade show')
-            redirect_url = redirect('auth:register')
+            redirect_url = reverse('auth:register')
         else:
             user = User.objects.create_user(
                 username=username, password=password, email=email)
             messages.success(
-                request, f'Thanks for registering {user.username}, Please check your mail inbox to verify your account.', extra_tags='alert alert-success alert-dismissible fade show')
-            redirect_url = redirect('auth:login')
+                request, f'Thanks for registering {user.username}, Please check your mail inbox to verify your account.',
+                extra_tags='alert alert-success alert-dismissible fade show')
+            user.groups.add('user')
+            redirect_url = reverse('auth:login')
 
         return redirect(redirect_url)
 

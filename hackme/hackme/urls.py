@@ -25,6 +25,9 @@ from web_project.views import SystemView
 urlpatterns = [
     path('admin/', admin.site.urls),
 
+    # Users urls
+    path("", include("apps.users.urls")),
+
     # Levels urls
     path("", include("apps.levels.urls")),
 
@@ -99,6 +102,8 @@ urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = SystemView.as_view(
     template_name="pages_misc_error.html", status=404)
+handler405 = SystemView.as_view(
+    template_name="pages_misc_not_authorized.html", status=404)
 handler400 = SystemView.as_view(
     template_name="pages_misc_error.html", status=400)
 handler500 = SystemView.as_view(

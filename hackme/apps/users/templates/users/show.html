@@ -5,7 +5,7 @@
 {% load i18n %}
 
 {% block title %}
-  {{ 'users.edit_title'|get_config }}
+  {{ 'users.show_title'|get_config }}
 {% endblock %}
 
 {% block vendor_css %}
@@ -46,9 +46,9 @@ href="{% static 'vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.
 
 {% block content %}
 <h4 class="py-3 mb-4">
-  <span class="text-muted fw-light">{{ 'users.name'|get_config }} /</span> {{ 'users.edit_title'|get_config }}
+  <span class="text-muted fw-light">{{ 'users.name'|get_config }} /</span> {{ 'users.show_title'|get_config }}
 </h4>
 
-<h1>Edit here</h1>
+<h1>Show here</h1>
 
 {% endblock %}

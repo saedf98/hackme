@@ -256,8 +256,42 @@
               href="{% url  'levels:create' %}"
               class="menu-link"
             >
-              <div class="text-truncate" data-i18n="Notifications">
-                Add level
+              <div class="text-truncate" data-i18n="Add Level">
+                Add Level
+              </div>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li
+        class="menu-item {% if '/users/' in request.path %}active open{% endif %}">
+        <a href="javascript:void(0);" class="menu-link menu-toggle">
+          <i class="menu-icon tf-icons bx bx-group"></i>
+          <div class="text-truncate" data-i18n="Users">
+            Users
+          </div>
+        </a>
+        <ul class="menu-sub">
+          <li
+            class="menu-item {% if '/users/' in request.path %}active{% endif %}"
+          >
+            <a
+              href="{% url 'users:index' %}"
+              class="menu-link"
+            >
+              <div class="text-truncate" data-i18n="Users">Users</div>
+            </a>
+          </li>
+          <li
+            class="menu-item {% if '/users/create/' in request.path %}active{% endif %}"
+          >
+            <a
+              href="{% url  'users:create' %}"
+              class="menu-link"
+            >
+              <div class="text-truncate" data-i18n="Add User">
+                Add User
               </div>
             </a>
           </li>
@@ -578,7 +612,7 @@
     <!-- Account -->
     <li class="menu-item {% if '/account_settings/' in request.path %}active open{% endif %}">
        <a href="javascript:void(0);" class="menu-link menu-toggle">
-         <i class="menu-icon tf-icons bx bx-dock-top"></i>
+         <i class="menu-icon tf-icons bx bx-cog"></i>
          <div class="text-truncate" data-i18n="Account Settings">
            Account Settings
          </div>

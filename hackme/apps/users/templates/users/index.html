@@ -1,0 +1,58 @@
+{% extends layout_path %}
+{% load table_tags %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}
+{{ 'users.index_title'|get_config }}
+{% endblock %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/perfect-scrollbar/perfect-scrollbar.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+<link rel="stylesheet"
+href="{% static 'vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/flatpickr/flatpickr.css' %}" />
+<!-- Row Group CSS -->
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-rowgroup-bs5/rowgroup.bootstrap5.css' %}" />
+<!-- Form Validation -->
+<link rel="stylesheet" href="{% static 'vendor/libs/%40form-validation/form-validation.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/sweetalert2/sweetalert2.css' %}" />
+{% comment %} <script src="jquery-3.7.1.min.js"></script> {% endcomment %}
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/perfect-scrollbar/perfect-scrollbar.js' %}"></script>
+<!-- Form Validation -->
+<script src="{% static 'vendor/libs/%40form-validation/popular.js' %}"></script>
+<script src="{% static 'vendor/libs/%40form-validation/bootstrap5.js' %}"></script>
+<script src="{% static 'vendor/libs/%40form-validation/auto-focus.js' %}"></script>
+<script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+<!-- Flat Picker -->
+<script src="{% static 'vendor/libs/moment/moment.js' %}"></script>
+<script src="{% static 'vendor/libs/flatpickr/flatpickr.js' %}"></script>
+<script src="{% static 'vendor/libs/sweetalert2/sweetalert2.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_js %}
+{{ block.super }}
+<script src="{% static 'js/extended-ui-perfect-scrollbar.js' %}"></script>
+{% endblock page_js %}
+
+{% block content %}
+<h4 class="py-3 mb-4">
+  <span class="text-muted fw-light">{{ 'users.name'|get_config }} /</span> {{ 'users.index_title'|get_config }}
+</h4>
+
+<div class="card">
+  <div class="card-datatable table-responsive pt-2">
+    {% render_table users %}
+  </div>
+</div>
+
+{% endblock %}
