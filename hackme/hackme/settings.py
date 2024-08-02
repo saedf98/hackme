@@ -58,18 +58,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Start Template shit
     "apps.dashboards",
-    "apps.layouts",
-    "apps.pages",
-    "apps.cards",
-    "apps.ui",
-    "apps.extended_ui",
-    "apps.icons",
-    "apps.forms",
-    "apps.form_layouts",
-    "apps.tables",
-    # End Template shit
     "apps.authentication",
     'apps.course_quizzes',
     'apps.course_topic_quizzes',
@@ -85,7 +74,9 @@ INSTALLED_APPS = [
     'apps.levels',
     'apps.user_progress',
     'apps.resources',
+    "apps.pages",
     'apps.users',
+    'apps.user',
     'apps.common',
     'table',
 ]
