@@ -9,7 +9,8 @@ class CourseTopic(TimeStampedModel):
     name = models.CharField(max_length=255, unique=True)
     slug = models.SlugField(blank=True, null=True)
     description = models.TextField()
-    course = models.ForeignKey(Course, on_delete=models.RESTRICT)
+    course = models.ForeignKey(
+        Course, related_name='course_topics', on_delete=models.RESTRICT)
 
     class Meta:
         db_table = 'course_topics'
@@ -18,3 +19,6 @@ class CourseTopic(TimeStampedModel):
         if not self.slug:
             self.slug = slugify(self.name)
         super(CourseTopic, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name

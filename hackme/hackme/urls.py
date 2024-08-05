@@ -28,6 +28,9 @@ urlpatterns = [
     # Users urls
     path("", include("apps.users.urls")),
 
+    # Users urls
+    path("", include("apps.user.urls")),
+
     # Levels urls
     path("", include("apps.levels.urls")),
 

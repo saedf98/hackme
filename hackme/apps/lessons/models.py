@@ -1,7 +1,9 @@
 from django.db import models
+from django.forms import ValidationError
 from django.utils.text import slugify
 from apps.common.models import LessonFormat, TimeStampedModel
 from apps.courses.models import Course
+from apps.course_topics.models import CourseTopic
 
 
 # Create your models here.
@@ -15,7 +17,14 @@ class Lesson(TimeStampedModel):
     )
     lesson_material = models.FileField(null=True, blank=True)
     lesson_text = models.TextField(null=True, blank=True)
-    course = models.ForeignKey(Course, on_delete=models.RESTRICT)
+    course = models.ForeignKey(
+        Course,
+        related_name='lessons',
+        on_delete=models.RESTRICT)
+    course_topic = models.ForeignKey(
+        CourseTopic,
+        related_name='lessons',
+        on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'lessons'

@@ -68,7 +68,8 @@ CONFIG = {
         'new_title': 'New Course',
         'create_title': 'Create Course',
         'edit_title': 'Edit Course',
-        'show_title': 'Show Course'
+        'show_title': 'Show Course',
+        'my_courses': 'My Courses'
     },
     'course_quizzes': {
         'name': 'Course Quizzes',

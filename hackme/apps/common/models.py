@@ -42,6 +42,12 @@ class CourseFormat(models.TextChoices):
     TEXT_VIDEO = "text_and_video", _("Text And Video")
 
 
+class CourseStatus(models.TextChoices):
+    DRAFT = 'draft', _("Draft")
+    PUBLISHED = 'published', _("Published")
+    ARCHIVED = 'archived', _("Archived")
+
+
 class LessonFormat(models.TextChoices):
     TEXT = "text", _("Text")
     VIDEO = "video", _("Video")

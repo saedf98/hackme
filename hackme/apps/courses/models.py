@@ -2,8 +2,9 @@ from django.db import models
 from django.utils.text import slugify
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
-from apps.common.models import TimeStampedModel, CourseFormat
+from apps.common.models import TimeStampedModel, CourseFormat, CourseStatus
 from apps.levels.models import Level
+from apps.users.models import User
 
 
 # Create your models here.
@@ -17,10 +18,16 @@ class Course(TimeStampedModel):
         choices=CourseFormat.choices,
         default=CourseFormat.TEXT,
     )
+    course_status = models.CharField(
+        max_length=15,
+        choices=CourseStatus.choices,
+        default=CourseStatus.DRAFT,
+    )
     level = models.ForeignKey(
         Level,
         on_delete=models.RESTRICT
     )
+    instructor = models.ForeignKey(User, on_delete=models.RESTRICT)
     content_type = models.ForeignKey(ContentType, on_delete=models.RESTRICT, limit_choices_to={
         # Replace with actual app labels
         'app_label__in': ['encryption_techniques', 'hashing_algorithms', 'digital_forensics'],
