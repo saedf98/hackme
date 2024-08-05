@@ -112,14 +112,12 @@
         <select
           id="select2_course_select"
           class="select2 form-select"
-          data-placeholder="All Courses"
+          data-placeholder="All Categories"
         >
-          <option value="">All Courses</option>
-          <option value="ui/ux">UI/UX</option>
-          <option value="seo">SEO</option>
-          <option value="web">Web</option>
-          <option value="music">Music</option>
-          <option value="painting">Painting</option>
+          <option value="">All Categories</option>
+          {% for content_type in course_content_types %}
+            <option value="{{content_type.app_label}}">{{content_type|capitalize_after_remove_vertical_bar}}</option>
+        {% endfor %}
         </select>
 
         <label class="switch">

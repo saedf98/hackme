@@ -27,6 +27,12 @@ urlpatterns = [
             template_name="user/courses/details.html"),
         name="course-details",
     ),
+    path(
+        "user/course/<int:course_id>/course-topic/<int:course_topic_id>/lesson/<int:lesson_id>",
+        UserCourseDetailsView.as_view(
+            template_name="user/lessons/details.html"),
+        name="lesson",
+    ),
     # path(
     #     "user/edit/<int:id>/",
     #     UserView.as_view(template_name="users/edit.html"),

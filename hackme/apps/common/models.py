@@ -53,6 +53,7 @@ class LessonFormat(models.TextChoices):
     VIDEO = "video", _("Video")
     PDF = "pdf", _("PDF")
     TEXT_VIDEO = "text_and_video", _("Text And Video")
+    VIDEO_LINK = "video_link", _("Video Link")
 
 
 class EncryptionType(models.TextChoices):
