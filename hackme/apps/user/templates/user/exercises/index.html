@@ -4,7 +4,7 @@
 {% load i18n %}
 
 {% block title %}
-{{ 'lessons.show_title'|get_config }}
+{{ 'exercises.show_title'|get_config }}
 {% endblock %}
 
 {% block vendor_css %}
@@ -34,8 +34,10 @@
 
 {% block page_js %}
 {{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
 <script src="{% static 'js/extended-ui-perfect-scrollbar.js' %}"></script>
 <script src="{% static 'js/app-course-details.js' %}"></script>
+<script src="{% static  'js/app-user-exercises-index.js' %}"></script>
 {% endblock page_js %}
 
 {% block content %}
@@ -56,72 +58,103 @@
       </div>
       <div class="card academy-content shadow-none border">
         <div class="p-2">
-
-          {% if lesson.lesson_format == "video" %}
-             <div class="cursor-pointer">
-                <video class="w-100" id="plyr-video-player" playsinline controls>
+          <div class="collapse" id="courseMaterial">
+            {% if lesson.lesson_format == "video" %}
+              <div class="cursor-pointer">
+                  <video class="w-100" id="plyr-video-player" playsinline controls>
+                  <source src="{{ lesson.lesson_material.url }}" type="video/mp4" />
+                </video>
+              </div>
+            {% elif lesson.lesson_format == "text" %}
+                <div class="p-2 mt-2">
+                  <h5 class="mb-2">Material</h5>
+                  {{lesson.lesson_text }}
+              </div>
+            {% elif lesson.lesson_format == "pdf" %}
+                <iframe src="{{ lesson.lesson_material.url }}" width="100%" height="500px">
+                  This browser does not support PDFs. Please download the PDF to view it: <a href="{{ lesson.lesson_material.url }}">Download PDF</a>
+                </iframe>
+            {% elif lesson.lesson_format == "text_and_video" %}
+              <div class="cursor-pointer">
+                <video class="w-100"
+                id="plyr-video-player" playsinline controls>
                 <source src="{{ lesson.lesson_material.url }}" type="video/mp4" />
-              </video>
-            </div>
-          {% elif lesson.lesson_format == "text" %}
-              <!--TODO: remove this after a while-->
-              {% comment %} <div class="cursor-pointer rounded">
+                </video>
+              </div>
+              <div class="card-body">
+                <h5 class="mb-2">Material</h5>
+                {{lesson.lesson_text }}
+              </div>
+            {% else %}
+              <div class="cursor-pointer rounded">
                 <iframe
-                    src="https://www.youtube.com/embed/bTqVqk7FSmY?origin=https://plyr.io&iv_load_policy=3&modestbranding=1&playsinline=1&showinfo=0&rel=0&enablejsapi=1"
+                    src="{{ lesson.lesson_video_link }}?origin=https://plyr.io&iv_load_policy=3&modestbranding=1&playsinline=1&showinfo=0&rel=0&enablejsapi=1"
                     frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowfullscreen
                     class="w-100"
                     height="400px"
-                  >
+                    >
                 </iframe>
               </div>
-              <div class="cursor-pointer">
-                <video class="w-100"
-                id="plyr-video-player" playsinline controls>
-                <source src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4" type="video/mp4" />
-                </video>
-              </div> {% endcomment %}
-              <div class="p-2 mt-2">
-                <h5 class="mb-2">Material</h5>
-                {{lesson.lesson_text }}
-             </div>
-          {% elif lesson.lesson_format == "pdf" %}
-              <iframe src="{{ lesson.lesson_material.url }}" width="100%" height="500px">
-                This browser does not support PDFs. Please download the PDF to view it: <a href="{{ lesson.lesson_material.url }}">Download PDF</a>
-              </iframe>
-          {% elif lesson.lesson_format == "text_and_video" %}
-            <div class="cursor-pointer">
-              <video class="w-100"
-              id="plyr-video-player" playsinline controls>
-              <source src="{{ lesson.lesson_material.url }}" type="video/mp4" />
-              </video>
-            </div>
-            <div class="card-body">
-              <h5 class="mb-2">Material</h5>
-              {{lesson.lesson_text }}
-            </div>
-          {% else %}
-            <div class="cursor-pointer rounded">
-              <iframe
-                  src="{{ lesson.lesson_video_link }}?origin=https://plyr.io&iv_load_policy=3&modestbranding=1&playsinline=1&showinfo=0&rel=0&enablejsapi=1"
-                  frameborder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowfullscreen
-                  class="w-100"
-                  height="400px"
-                  >
-              </iframe>
-            </div>
-          {% endif %}
-
-          <div class="d-flex justify-content-start my-3">
-            {% if lesson.exercise %}
-              <a href="{% url 'user:exercise' course.id course_topic_id lesson_id %}" class="btn btn-sm btn-primary pl-2">Start Exercise</a>
             {% endif %}
           </div>
 
+          <div class="d-flex justify-content-start my-3">
+            <button
+            class="btn btn-primary btn-sm"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#courseMaterial"
+             aria-expanded="false"
+             aria-controls="courseMaterial">
+              Display/Hide Material
+            </button>
+          </div>
         </div>
+      </div>
+
+      <div class="card exercise-content shadow-none border mt-2 mt-md-3">
+
+        <div class="d-flex flex-column flex-container justify-content-start">
+          <div class="m-3">
+            <p>Question?</p>
+            <p>{{lesson.exercise.question}}</p>
+          </div>
+          {% if messages %}
+              <div class="messages mx-3">
+                  {% for message in messages %}
+                  <div {% if message.tags %} class="{{ message.tags }}" {% endif %}
+                    role="alert">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                      aria-label="Close"
+                    ></button>
+                    {{ message|escape }}
+                    {% comment %} <strong>{{ message }}</strong> {% endcomment %}
+                  </div>
+                  {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="d-flex flex-container justify-content-center" style="">
+          <input type="hidden" id="language" value="python">
+          <div id="editor" class="mt-2" style="width: 93%;height: 200px; border: 1px solid #ccc;">print("Hello, World!")</div>
+        </div>
+        <div class="d-flex justify-content-start align-content-center">
+          <button onclick="runCode()" class="btn btn-sm btn-primary m-4">Run Code</button>
+        </div>
+        <div class="d-flex justify-content-center align-content-center mb-3 mx-4" style="height: 100px">
+          <div id="output"class="h-auto w-100 overflow-auto bg-secondary bg-opacity-10 p-2" ></div>
+        </div>
+        <form action="" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="exercise_id" value="{{exercise.id}}">
+          <input type="hidden" id="solution" name="solution">
+          <input type="hidden" id="solution_output" name="solution_output">
+          <div class="d-flex justify-content-start align-content-center">
+            <button id="submit-exercise" type="submit" class="btn btn-sm btn-primary mx-4 my-3" disabled>Submit</button>
+          </div>
+        </form>
       </div>
     </div>
     <div class="col-lg-4">

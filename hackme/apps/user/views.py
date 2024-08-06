@@ -1,10 +1,14 @@
 from django.urls import reverse_lazy
-from django.contrib.contenttypes.models import ContentType
-from apps.common.views import UserDashboardView
-from django.views.generic import ListView
-from apps.courses.models import Course
-from apps.user_progress.models import UserCourses
+from django.contrib import messages
+from django.shortcuts import redirect
+from .forms import LessonExerciseForm
 from apps.lessons.models import Lesson
+from apps.courses.models import Course
+from django.views.generic import ListView
+from apps.exercises.models import Exercise
+from apps.common.views import UserDashboardView
+from apps.user_progress.models import UserCourses
+from django.contrib.contenttypes.models import ContentType
 
 
 # Create your views here.
@@ -32,8 +36,6 @@ class UserProfileView(UserDashboardView):
         # Add more data to the context specific to this view
         context.update({
             "additional_data": "This is some additional data for MyView",
-            # Example of adding a URL to the context
-            "some_url": reverse_lazy('some_named_url'),
         })
 
         return context
@@ -61,27 +63,11 @@ class UserCoursesView(UserDashboardView, ListView):
             model__in=model_names
         )
 
-        # course_with_content_type = []
-        # # Iterate over the courses in the queryset
-        # for course in context['courses']:
-        #     # Get the model class for the content_type
-        #     model_class = course.content_type.model_class()
-        #     # Fetch the related instance
-        #     related_instance = model_class.objects.get(id=course.object_id)
-        #     # Append detailed information to the list
-        #     course_with_content_type.append({
-        #         'course': course,
-        #         'content_type': course.content_type,
-        #         'related_instance': related_instance
-        #     })
-
         # Add more data to the context specific to this view
         context.update({
             "additional_data": "This is some additional data for MyView",
             "course_count": course_count,
             "course_content_types": course_content_types,
-            # Example of adding a URL to the context
-            # "some_url": reverse_lazy('some_named_url'),
         })
 
         return context
@@ -97,16 +83,12 @@ class UserMyCoursesView(UserDashboardView):
         # Add more data to the context specific to this view
         context.update({
             "additional_data": "This is some additional data for MyView",
-            # Example of adding a URL to the context
-            # "some_url": reverse_lazy('some_named_url'),
         })
 
         return context
 
 
-class UserCourseDetailsView(UserDashboardView):
-    model = Course
-    context_object_name = 'courses'
+class UserCourseTopicsView(UserDashboardView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -126,9 +108,88 @@ class UserCourseDetailsView(UserDashboardView):
             "course_topics": course_topics,
             "users_count": users_count,
             "total_duration": total_duration
-
-            # Example of adding a URL to the context
-            # "some_url": reverse_lazy('some_named_url'),
         })
 
         return context
+
+
+class UserCourseDetailsView(UserCourseTopicsView):
+    model = Course
+    context_object_name = 'courses'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class UserLessonView(UserCourseTopicsView):
+    model = Lesson
+    context_object_name = 'lessons'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        course_topic_id = self.kwargs.get('course_topic_id')
+        lesson_id = self.kwargs.get('lesson_id')
+        lesson = Lesson.objects.get(pk=lesson_id)
+
+        # Add more data to the context specific to this view
+        context.update({
+            "lesson": lesson,
+            "lesson_id": lesson_id,
+            "course_topic_id": course_topic_id
+        })
+
+        return context
+
+
+class UserExerciseView(UserCourseTopicsView):
+    model = Exercise
+    context_object_name = 'exercises'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        course_id = self.kwargs.get('id')
+        course_topic_id = self.kwargs.get('course_topic_id')
+        lesson_id = self.kwargs.get('lesson_id')
+        lesson = Lesson.objects.get(pk=lesson_id)
+        exercise = Exercise.objects.get(
+            lesson=lesson_id,
+            course=course_id)
+
+        # Add more data to the context specific to this view
+        context.update({
+            "lesson": lesson,
+            "exercise": exercise,
+            "lesson_id": lesson_id,
+            "course_topic_id": course_topic_id
+        })
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+
+        redirect_url = request.META.get('HTTP_REFERER', '/')
+        lesson_exercise_form = LessonExerciseForm(request.POST)
+        if lesson_exercise_form.is_valid():
+            exercise_id = lesson_exercise_form.cleaned_data['exercise_id']
+            solution = lesson_exercise_form.cleaned_data['solution']
+            solution_output = lesson_exercise_form.cleaned_data['solution_output']
+
+            user_id = self.request.user.id
+            exercise = Exercise.objects.get(pk=exercise_id)
+            if exercise.answer != solution_output:
+                messages.error(
+                    request,
+                    "Incorrect solution, go through the lesson again and comeback to the exercise solve!",
+                    extra_tags='alert alert-danger alert-dismissible fade show')
+
+                # TODO: check if solution is correct, if yes, mark lesson and exercise for user as completed
+                # and save users solution 
+            return redirect(redirect_url)
+
+        messages.error(
+            request, "Please solve the exercise before submission!",
+            extra_tags='alert alert-danger alert-dismissible fade show')
+
+        return redirect(redirect_url)
+        # return HttpResponseRedirect("")

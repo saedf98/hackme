@@ -80,5 +80,10 @@ class Lesson(TimeStampedModel):
             self.duration = estimate_reading_time(self.lesson_text)
         super(Lesson, self).save(*args, **kwargs)
 
+    @property
+    def has_exercise(self):
+        print("I got here")
+        return self.exercise.exists()
+
     def __str__(self):
         return self.name

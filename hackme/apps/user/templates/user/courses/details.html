@@ -56,20 +56,6 @@
       </div>
       <div class="card academy-content shadow-none border">
         <div class="p-2">
-          {% comment %} <div class="cursor-pointer"><video class="w-100" poster="../../../../cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg" id="plyr-video-player" playsinline controls>
-              <source src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4" type="video/mp4" />
-            </video>
-          </div> {% endcomment %}
-          {% comment %} {% if lesson.status == "completed" %}
-              <span class="badge bg-success">Completed</span>
-          {% elif lesson.status == "in_progress" %}
-              <span class="badge bg-warning">In Progress</span>
-          {% elif lesson.status == "not_started" %}
-              <span class="badge bg-secondary">Not Started</span>
-          {% else %}
-              <span class="badge bg-info">Unknown Status</span>
-          {% endif %} {% endcomment %}
-
           <div class="cursor-pointer">
             <img src="{{ course.image.url }}" alt="" class="w-100 border border-secondary-subtle bg-primary rounded" style="height: 400px;">
           </div>
@@ -131,7 +117,7 @@
                   <div class="form-check d-flex align-items-center mb-3">
                     <input class="form-check-input" type="checkbox" id="defaultCheck{{lesson_kount}}"  {% if lesson.completed %}checked=""{% endif %} />
                     <label for="defaultCheck{{lesson_kount}}" class="form-check-label ms-3">
-                      <a class="mb-0 h6" href="#">{{lesson_kount}}. {{lesson.name}}</a>
+                      <a class="mb-0 h6" href="{% url 'user:lesson' course.id course_topic.id lesson.id %}">{{lesson_kount}}. {{lesson.name}}</a>
                         <span class="text-muted d-block">{{ lesson.duration|convert_minutes }}</span>
                     </label>
                   </div>

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserProfileView, UserCoursesView, UserMyCoursesView, UserCourseDetailsView
+from .views import UserProfileView, UserCoursesView, UserMyCoursesView, UserCourseDetailsView, UserLessonView, UserExerciseView
 
 app_name = "user"
 
@@ -28,10 +28,16 @@ urlpatterns = [
         name="course-details",
     ),
     path(
-        "user/course/<int:course_id>/course-topic/<int:course_topic_id>/lesson/<int:lesson_id>",
-        UserCourseDetailsView.as_view(
-            template_name="user/lessons/details.html"),
+        "user/course/<int:id>/course-topic/<int:course_topic_id>/lesson/<int:lesson_id>",
+        UserLessonView.as_view(
+            template_name="user/lessons/index.html"),
         name="lesson",
+    ),
+    path(
+        "user/course/<int:id>/course-topic/<int:course_topic_id>/lesson/<int:lesson_id>/exercises",
+        UserExerciseView.as_view(
+            template_name="user/exercises/index.html"),
+        name="exercise",
     ),
     # path(
     #     "user/edit/<int:id>/",

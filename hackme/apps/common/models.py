@@ -13,8 +13,8 @@ class TimeStampedModel(models.Model):
 
 
 class Quiz(TimeStampedModel):
-    name = models.CharField(max_length=255)
-    slug = models.SlugField(blank=True, null=True)
+    name = models.CharField(max_length=255, blank=True)
+    slug = models.SlugField(blank=True)
     question = models.TextField()
     options = models.JSONField(blank=False, null=False)
     correct_answer = models.CharField(max_length=255)

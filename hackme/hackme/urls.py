@@ -28,6 +28,9 @@ urlpatterns = [
     # Users urls
     path("", include("apps.users.urls")),
 
+    # Common urls
+    path("", include("apps.common.urls")),
+
     # Users urls
     path("", include("apps.user.urls")),
 
