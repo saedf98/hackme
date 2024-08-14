@@ -1,15 +1,20 @@
 from django.urls import path
-from .views import UserProfileView, UserCoursesView, UserMyCoursesView, UserCourseDetailsView, UserLessonView, UserExerciseView
+from .views import UserProfileView, AdminProfileView, UserCoursesView, UserMyCoursesView, UserCourseDetailsView, UserLessonView, UserExerciseView, UserAcademicDashboardView
 
 app_name = "user"
 
 urlpatterns = [
     path(
-        "user/",
+        "user",
         UserProfileView.as_view(template_name="profile/index.html"),
         name="index",
     ),
-
+    path(
+        "user/dashboard",
+        UserAcademicDashboardView.as_view(
+            template_name="user/dashboard/index.html"),
+        name="dashboard",
+    ),
     path(
         "user/courses",
         UserCoursesView.as_view(template_name="user/courses/index.html"),
@@ -38,6 +43,21 @@ urlpatterns = [
         UserExerciseView.as_view(
             template_name="user/exercises/index.html"),
         name="exercise",
+    ),
+    path(
+        "user/register-course/<int:course_id>",
+        UserCoursesView.as_view(template_name="user/courses/index.html"),
+        name="register-course",
+    ),
+    path(
+        "user/profile",
+        UserProfileView.as_view(template_name="user/profile/index.html"),
+        name="user-profile",
+    ),
+    path(
+        "user/admin/profile",
+        AdminProfileView.as_view(template_name="user/profile/index.html"),
+        name="admin-profile",
     ),
     # path(
     #     "user/edit/<int:id>/",

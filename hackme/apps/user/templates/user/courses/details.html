@@ -15,7 +15,6 @@
 <link rel="stylesheet" href="{% static 'vendor/libs/typeahead-js/typeahead.css' %}" />
 <link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
 <link rel="stylesheet" href="{% static 'vendor/libs/plyr/plyr.css' %}" />
-{% comment %} <script src="jquery-3.7.1.min.js"></script> {% endcomment %}
 {% endblock vendor_css %}
 
 {% block page_css %}
@@ -27,9 +26,10 @@
 {{ block.super }}
 <script src="{% static 'vendor/libs/perfect-scrollbar/perfect-scrollbar.js' %}"></script>
 <!-- Form Validation -->
-<script src="{% static 'vendor/libs/sweetalert2/sweetalert2.js' %}"></script>
+{% comment %} <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> {% endcomment %}
 <script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
 <script src="{% static 'vendor/libs/plyr/plyr.js' %}"></script>
+<script src="{% static 'vendor/libs/sweetalert2/sweetalert2.js' %}"></script>
 {% endblock vendor_js %}
 
 {% block page_js %}
@@ -62,8 +62,7 @@
         </div>
         <div class="card-body">
           <h5 class="mb-2">About this course</h5>
-          <p class="mb-0 pt-1">Learn web design in 1 hour with 25+ simple-to-use rules and guidelines — tons
-            of amazing web design resources included!</p>
+          <p class="mb-0 pt-1">Learn "{{ course.name|lower  }}" in {{total_duration|convert_minutes}} with {{lessons_count}} lessons!</p>
           <hr class="my-4">
           <h5>By the numbers</h5>
           <div class="d-flex flex-wrap">
@@ -105,8 +104,14 @@
             <div class="accordion-header" id="heading{{kount}}">
               <button type="button" class="accordion-button bg-lighter rounded-0 {% if kount != "One" %} collapsed {% endif %}" data-bs-toggle="collapse" data-bs-target="#chapter{{kount}}" aria-expanded="{% if kount == "One" %} true {% else %} false {% endif %}" aria-controls="chapter{{kount}}">
                 <span class="d-flex flex-column">
-                  <span class="h5 mb-1">{{course_topic.name}}</span>
-                    <span class="fw-normal text-body">0 / {{course_topic.lessons.all.count}} | {{course_topic.lessons.all|total_duration|convert_minutes}}</span>
+                  <span class="h5 mb-1">{{course_topic.name}}
+                    {% with completed_lessons_count=completed_lessons_count|get_item:course_topic.id %}
+                      {% if completed_lessons_count == course_topic.lessons.all.count  and completed_lessons_count > 0%}
+                        <span class="btn-sm rounded-pill p-1 text-sm btn-success fs-6">completed</span>
+                      {% endif %}
+                    {% endwith %}
+                  </span>
+                  <span class="fw-normal text-body">{{ completed_lessons_count|get_item:course_topic.id }} / {{course_topic.lessons.all.count}} | {{course_topic.lessons.all|total_duration|convert_minutes}}</span>
                 </span>
               </button>
             </div>
@@ -115,7 +120,15 @@
                 {% for lesson in course_topic.lessons.all %}
                   {% with lesson_kount=forloop.counter %}
                   <div class="form-check d-flex align-items-center mb-3">
-                    <input class="form-check-input" type="checkbox" id="defaultCheck{{lesson_kount}}"  {% if lesson.completed %}checked=""{% endif %} />
+                    <input class="form-check-input" type="checkbox" id="defaultCheck{{lesson_kount}}"
+                      {% with user_lesson=user_lesson_dict|get_item:lesson.id %}
+                        {% if user_lesson %}
+                            {% if user_lesson.completed %}
+                              checked=""
+                            {% endif %}
+                        {% endif %}
+                      {% endwith %}
+                    />
                     <label for="defaultCheck{{lesson_kount}}" class="form-check-label ms-3">
                       <a class="mb-0 h6" href="{% url 'user:lesson' course.id course_topic.id lesson.id %}">{{lesson_kount}}. {{lesson.name}}</a>
                         <span class="text-muted d-block">{{ lesson.duration|convert_minutes }}</span>
@@ -130,8 +143,14 @@
                     </div>
                   </div>
                 {% endfor %}
+                {% with completed_lessons_count=completed_lessons_count|get_item:course_topic.id %}
+                  {% if completed_lessons_count == course_topic.lessons.all.count  and completed_lessons_count == 0%}
+                    <span class="btn-sm rounded-pill p-1 text-sm btn-success fs-6">Lesson Quiz</span>
+                  {% endif %}
+                {% endwith %}
               </div>
             </div>
+
           </div>
         {% endwith %}
         {% empty %}

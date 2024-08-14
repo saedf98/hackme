@@ -69,7 +69,8 @@ class LoginAuthView(AuthView):
         user = authenticate(username=username, password=password)
 
         if user is not None:
-            if user.userprofile.email_verified:
+            print(user)
+            if user.profile.email_verified:
                 login(request, user)
                 # redirect_url = request.GET.get('next', 'home')
                 redirect_url = request.POST.get('next') or 'index'

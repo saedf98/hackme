@@ -22,31 +22,32 @@
 
   <div class="menu-inner-shadow"></div>
 
-  <!--TODO(toheeb): look intothe dashboard and fix this for different user roles -->
+  <!--TODO(toheeb): look into the dashboard and fix this for different user roles -->
   <ul class="menu-inner py-1">
-    <li class="menu-item {% if 'index' == request.resolver_match.url_name or '/dashboard/' in request.path %}active{% endif %}">
+    {% comment %} <li class="menu-item {% if 'index' == request.resolver_match.url_name or '/dashboard/' in request.path %}active{% endif %}">
       <a href="{% url 'dashboard' %}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-home-circle"></i>
         <div class="text-truncate" data-i18n="Dashboards">
           Dashboard
         </div>
       </a>
-    </li>
+    </li> {% endcomment %}
 
+    {% comment %} {{request.path}} {% endcomment %}
+    {% comment %} {{request.resolver_match.url_name}} {% endcomment %}
     {% if request.user.is_staff or request.user|in_user_group:"instructor"%}
 
       {% comment %} <li class="menu-header small text-uppercase">
         <span class="menu-header-text">Admin / Instructor</span>
       </li> {% endcomment %}
-
-      {% comment %} <li class="menu-item  {% if 'index' == request.resolver_match.url_name or '/dashboard/' in request.path %}active{% endif %}">
+      <li class="menu-item  {% if 'index' == request.resolver_match.url_name or '/dashboard/' in request.path %}active{% endif %}">
         <a href="{% url 'dashboard' %}" class="menu-link">
             <i class="menu-icon tf-icons bx bx-home-circle"></i>
             <div class="text-truncate" data-i18n="Dashboard">
               Dashboard
             </div>
         </a>
-      </li> {% endcomment %}
+      </li>
 
       <li
         class="menu-item {% if '/levels/' in request.path %}active open{% endif %}">
@@ -390,6 +391,15 @@
         </ul>
       </li>
 
+      <li class="menu-item {% if 'admin-profile' == request.resolver_match.url_name or '/user/admin/profile' in request.path %}active{% endif %}">
+        <a href="{% url 'user:admin-profile' %}" class="menu-link">
+          <i class="menu-icon tf-icons bx bx-user"></i>
+            <div class="text-truncate" data-i18n="Profile">
+              Profile
+            </div>
+        </a>
+      </li>
+
     {% endif %}
 
     {% if not request.user.is_staff and not request.user|in_user_group:"instructor"  %}
@@ -397,17 +407,16 @@
     {% comment %} <li class="menu-header small text-uppercase">
       <span class="menu-header-text">User</span>
     </li> {% endcomment %}
-
-    {% comment %} <li class="menu-item {% if '/dashboard/' in request.path %}active{% endif %}">
-      <a href="{% url 'dashboard' %}" class="menu-link">
+    <li class="menu-item {% if 'dashboard' == request.resolver_match.url_name or '/user/dashboard' in request.path %}active{% endif %}">
+      <a href="{% url 'user:dashboard' %}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-home-circle"></i>
-          <div class="text-truncate" data-i18n="Dashboard">
-            Dashboard
-          </div>
+        <div class="text-truncate" data-i18n="Dashboard">
+          Dashboard
+        </div>
       </a>
-    </li> {% endcomment %}
+    </li>
 
-    <li class="menu-item {% if '/dashboard/' in request.path %}active{% endif %}">
+    <li class="menu-item {% if 'courses' == request.resolver_match.url_name or '/user/courses' in request.path %}active{% endif %}">
       <a href="{% url 'user:courses' %}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-book-alt"></i>
           <div class="text-truncate" data-i18n="Courses">
@@ -416,7 +425,7 @@
       </a>
     </li>
 
-    <li class="menu-item {% if '/dashboard/' in request.path %}active{% endif %}">
+    <li class="menu-item {% if 'my-courses' == request.resolver_match.url_name or '/user/my-courses' in request.path %}active{% endif %}">
       <a href="{% url 'user:my-courses' %}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-book-bookmark"></i>
           <div class="text-truncate" data-i18n="My Courses">
@@ -425,10 +434,19 @@
       </a>
     </li>
 
+    <li class="menu-item {% if 'user-profile' == request.resolver_match.url_name or '/user/profile' in request.path %}active{% endif %}">
+      <a href="{% url 'user:user-profile' %}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-user"></i>
+          <div class="text-truncate" data-i18n="Profile">
+            Profile
+          </div>
+      </a>
+    </li>
+
     {% endif %}
 
     <!-- Account -->
-    <li class="menu-item {% if '/account_settings/' in request.path %}active open{% endif %}">
+    {% comment %} <li class="menu-item {% if '/account_settings/' in request.path %}active open{% endif %}">
        <a href="javascript:void(0);" class="menu-link menu-toggle">
          <i class="menu-icon tf-icons bx bx-cog"></i>
          <div class="text-truncate" data-i18n="Account Settings">
@@ -463,7 +481,7 @@
            </a>
          </li>
        </ul>
-    </li>
+    </li> {% endcomment %}
 
   </ul>
 </aside>

@@ -117,7 +117,13 @@
 
           <div class="d-flex justify-content-start my-3">
             {% if lesson.exercise %}
-              <a href="{% url 'user:exercise' course.id course_topic_id lesson_id %}" class="btn btn-sm btn-primary pl-2">Start Exercise</a>
+              {% with user_lesson=user_lesson_dict|get_item:lesson.id %}
+                {% if not user_lesson.completed %}
+                  <a href="{% url 'user:exercise' course.id course_topic_id lesson_id %}" class="btn btn-sm btn-primary pl-2">Start Exercise</a>
+                {% else %}
+                  <a href="{% url 'user:exercise' course.id course_topic_id lesson_id %}" class="btn btn-sm btn-primary pl-2">View Submitted Solution</a>
+              {% endif %}
+              {% endwith %}
             {% endif %}
           </div>
 
@@ -132,8 +138,14 @@
             <div class="accordion-header" id="heading{{kount}}">
               <button type="button" class="accordion-button bg-lighter rounded-0 {% if course_topic.id == course_topic_id %} collapsed {% endif %}" data-bs-toggle="collapse" data-bs-target="#chapter{{kount}}" aria-expanded="{% if kount == "One" %} true {% else %} false {% endif %}" aria-controls="chapter{{kount}}">
                 <span class="d-flex flex-column">
-                  <span class="h5 mb-1">{{course_topic.name}}</span>
-                    <span class="fw-normal text-body">0 / {{course_topic.lessons.all.count}} | {{course_topic.lessons.all|total_duration|convert_minutes}}</span>
+                  <span class="h5 mb-1">{{course_topic.name}}
+                    {% with completed_lessons_count=completed_lessons_count|get_item:course_topic.id %}
+                      {% if completed_lessons_count == course_topic.lessons.all.count  and completed_lessons_count > 0%}
+                        <span class="btn-sm rounded-pill p-1 text-sm btn-success fs-6">completed</span>
+                      {% endif %}
+                    {% endwith %}
+                  </span>
+                    <span class="fw-normal text-body">{{ completed_lessons_count|get_item:course_topic.id }}/ {{course_topic.lessons.all.count}} | {{course_topic.lessons.all|total_duration|convert_minutes}}</span>
                 </span>
               </button>
             </div>
@@ -142,7 +154,15 @@
                 {% for lesson in course_topic.lessons.all %}
                   {% with lesson_kount=forloop.counter %}
                   <div class="form-check d-flex align-items-center mb-3">
-                    <input class="form-check-input" type="checkbox" id="defaultCheck{{lesson_kount}}"  {% if lesson.completed %}checked=""{% endif %} />
+                    <input class="form-check-input" type="checkbox" id="defaultCheck{{lesson_kount}}"
+                      {% with user_lesson=user_lesson_dict|get_item:lesson.id %}
+                        {% if user_lesson %}
+                            {% if user_lesson.completed %}
+                              checked=""
+                            {% endif %}
+                        {% endif %}
+                      {% endwith %}
+                    />
                     <label for="defaultCheck{{lesson_kount}}" class="form-check-label ms-3">
                       <a class="mb-0 h6 {% if lesson.id == lesson_id %} text-primary {% endif %}" href="{% url 'user:lesson' course.id course_topic.id lesson.id %}">{{lesson_kount}}. {{lesson.name}}</a>
                         <span class="text-muted d-block">{{ lesson.duration|convert_minutes }}</span>

@@ -128,3 +128,8 @@ def total_lessons(lessons):
 @register.filter
 def total_completed_lessons(lessons):
     return sum(lesson.duration.completed for lesson in lessons)
+
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)

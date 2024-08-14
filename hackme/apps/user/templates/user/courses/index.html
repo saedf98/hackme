@@ -30,6 +30,7 @@
 <script src="{% static 'vendor/libs/sweetalert2/sweetalert2.js' %}"></script>
 <script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
 <script src="{% static 'vendor/libs/plyr/plyr.js' %}"></script>
+<script src="{% static  'js/app-user-courses-index.js' %}"></script>
 {% endblock vendor_js %}
 
 {% block page_js %}
@@ -154,54 +155,83 @@
                     class="d-flex align-items-center justify-content-center gap-1 mb-0"
                   >
                     4.4
-                    <span class="text-warning"
-                      ><i
-                        class="ti ti-star-filled me-1 mt-n1"
-                      ></i></span
-                    ><span class="text-muted">(1.23k)</span>
+                    <span class="text-warning">
+                      <i class="ti ti-star-filled me-1 mt-n1"></i>
+                    </span>
+                    <span class="text-muted">({{ course_user_counts|get_item:course.id|default:0 }})</span>
                   </h6>
                 </div>
-                <a href="app-academy-course-details.html" class="h5">
+                <a href="{% url 'user:course-details' course.id %}" class="h5">
                   {{course.name}}
                 </a>
                 <p class="mt-2">
                   {{ course.description|truncate_71 }}
                 </p>
                 <p><span class="badge {% random_bg_label_color %}">{{ course.content_type|remove_before_vertical_bar }} </span></p>
-                <p class="d-flex align-items-center">
-                  <i class="ti ti-clock me-2 mt-n1"></i>30 minutes
-                </p>
-                <div class="progress mb-4" style="height: 8px">
-                  <div
-                    class="progress-bar w-75"
-                    role="progressbar"
-                    aria-valuenow="25"
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                  ></div>
-                </div>
-                <div
-                  class="d-flex flex-column flex-md-row gap-2 text-nowrap"
-                >
-                  <a
-                    class="app-academy-md-50 btn btn-outline-secondary me-md-2 d-flex align-items-center"
-                    href="app-academy-course-details.html"
-                  >
-                    <i
-                      class="ti ti-rotate-clockwise-2 align-middle scaleX-n1-rtl me-2 mt-n1 ti-sm"
-                    ></i
-                    ><span>Start Over</span>
-                  </a>
-                  <a
-                    class="app-academy-md-50 btn btn-outline-primary d-flex align-items-center"
-                      href="{% url 'user:course-details' course.id %}"
-                  >
-                    <span class="me-2">Continue</span
-                    ><i
-                      class="ti ti-chevron-right scaleX-n1-rtl ti-sm"
-                    ></i>
-                  </a>
-                </div>
+                {% with completed=registered_courses|get_item:course.id %}
+                  {% if completed is not None %}
+                    <form action="{% url 'user:register-course' course.id %}" id="start-over-form" method="post" style="display:none">
+                      {% csrf_token %}
+                      <input type="hidden" name="route-name" value="start-over">
+                    </form>
+                    {% if completed %}
+                      <p class="d-flex align-items-center">
+                        <i class="bx bx-check me-1"></i>Completed
+                      </p>
+                      <div class="progress mb-4" style="height: 8px">
+                        <div
+                          class="progress-bar w-100"
+                          role="progressbar"
+                          aria-valuenow="100"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        ></div>
+                      </div>
+                        <button class="w-100 btn btn-label-primary start-over-btn"><i class="ti ti-rotate-clockwise-2 align-middle scaleX-n1-rtl me-2 mt-n1 ti-s"></i>Start Over</button>
+                    {% else %}
+                        <p class="d-flex align-items-center">
+                          <i class="ti ti-clock me-2 mt-n1"></i>30 minutes
+                        </p>
+                        <div class="progress mb-4" style="height: 8px">
+                          <div
+                            class="progress-bar w-0"
+                            role="progressbar"
+                            aria-valuenow="25"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                          ></div>
+                        </div>
+                        <div class="d-flex flex-column flex-md-row gap-2 text-nowrap">
+                          <button class="app-academy-md-50 btn btn-outline-secondary me-md-2 d-flex align-items-center start-over-btn">
+                            <i class="ti ti-rotate-clockwise-2 align-middle scaleX-n1-rtl me-2 mt-n1 ti-sm"></i>
+                            <span>Start Over</span>
+                          </button>
+                          <a class="app-academy-md-50 btn btn-outline-primary d-flex align-items-center" href="{% url 'user:course-details' course.id %}">
+                            <span class="me-2">Continue</span>
+                            <i class="ti ti-chevron-right scaleX-n1-rtl ti-sm"></i>
+                          </a>
+                        </div>
+                    {% endif %}
+                  {% else %}
+                      <p class="d-flex align-items-center">
+                        <i class="ti ti-clock me-2 mt-n1"></i>30 minutes
+                      </p>
+                      <div class="progress mb-4" style="height: 8px">
+                        <div
+                          class="progress-bar w-0"
+                          role="progressbar"
+                          aria-valuenow="25"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        ></div>
+                      </div>
+                      <form action="{% url 'user:register-course' course.id %}" method="post">
+                          {% csrf_token %}
+                          <input type="hidden" name="route-name" value="register-course">
+                          <button type="submit" class="w-100 btn btn-label-primary"><i class='bx bxs-door-open'></i> Register</button>
+                      </form>
+                  {% endif %}
+                {% endwith %}
               </div>
             </div>
           </div>

@@ -2,7 +2,8 @@ const editor = ace.edit("editor");
 editor.setTheme("ace/theme/monokai");
 editor.session.setMode("ace/mode/python");
 
-
+const userExerciseCompleted =  document.getElementById("user_exercise_completed").getAttribute("data-user-exercise-completed") === "true";
+// alert(userExerciseCompleted)
 document.getElementById('language').addEventListener('change', function() {
     const language = this.value;
     const mode = language === 'python' ? 'ace/mode/python' : 'ace/mode/javascript';
@@ -26,7 +27,9 @@ function runCode() {
     .then(data => {
         document.getElementById('output').innerText = data.output;
         if(data.output != ""){
-          document.getElementById("submit-exercise").removeAttribute("disabled");
+          if (!userExerciseCompleted) {
+            document.getElementById("submit-exercise").removeAttribute("disabled");
+          };
         }else{
           document.getElementById("submit-exercise").setAttribute("disabled", "true");
         }
@@ -65,3 +68,4 @@ document.getElementById("submit-exercise").addEventListener("click", (e) => {
     form.submit();
   }
 })
+

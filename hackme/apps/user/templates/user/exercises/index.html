@@ -37,6 +37,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
 <script src="{% static 'js/extended-ui-perfect-scrollbar.js' %}"></script>
 <script src="{% static 'js/app-course-details.js' %}"></script>
+<script src="{% static  'js/app-user-course-index.js' %}"></script>
 <script src="{% static  'js/app-user-exercises-index.js' %}"></script>
 {% endblock page_js %}
 
@@ -118,7 +119,7 @@
 
         <div class="d-flex flex-column flex-container justify-content-start">
           <div class="m-3">
-            <p>Question?</p>
+            <p>Question?  {% if user_exercise.completed %} ✅  {% endif %}</p>
             <p>{{lesson.exercise.question}}</p>
           </div>
           {% if messages %}
@@ -138,10 +139,11 @@
         </div>
         <div class="d-flex flex-container justify-content-center" style="">
           <input type="hidden" id="language" value="python">
-          <div id="editor" class="mt-2" style="width: 93%;height: 200px; border: 1px solid #ccc;">print("Hello, World!")</div>
+          <div id="editor" class="mt-2" style="width: 93%;height: 200px; border: 1px solid #ccc;">{% if user_exercise %}{{ user_exercise.solution }}{% else %}print("Hello, World!"){% endif %}</div>
         </div>
         <div class="d-flex justify-content-start align-content-center">
           <button onclick="runCode()" class="btn btn-sm btn-primary m-4">Run Code</button>
+          {% comment %} <button class="btn btn-sm btn-primary m-4" id="run-code">Run Code</button> {% endcomment %}
         </div>
         <div class="d-flex justify-content-center align-content-center mb-3 mx-4" style="height: 100px">
           <div id="output"class="h-auto w-100 overflow-auto bg-secondary bg-opacity-10 p-2" ></div>
@@ -151,8 +153,10 @@
           <input type="hidden" name="exercise_id" value="{{exercise.id}}">
           <input type="hidden" id="solution" name="solution">
           <input type="hidden" id="solution_output" name="solution_output">
+          <input type="hidden" id="user_exercise_completed"
+          data-user-exercise-completed="{{ user_exercise.completed|yesno:'true,false'}}">
           <div class="d-flex justify-content-start align-content-center">
-            <button id="submit-exercise" type="submit" class="btn btn-sm btn-primary mx-4 my-3" disabled>Submit</button>
+              <button id="submit-exercise" type="submit" class="btn btn-sm btn-primary mx-4 my-3" disabled>Submit</button>
           </div>
         </form>
       </div>
@@ -165,8 +169,14 @@
             <div class="accordion-header" id="heading{{kount}}">
               <button type="button" class="accordion-button bg-lighter rounded-0 {% if course_topic.id == course_topic_id %} collapsed {% endif %}" data-bs-toggle="collapse" data-bs-target="#chapter{{kount}}" aria-expanded="{% if kount == "One" %} true {% else %} false {% endif %}" aria-controls="chapter{{kount}}">
                 <span class="d-flex flex-column">
-                  <span class="h5 mb-1">{{course_topic.name}}</span>
-                    <span class="fw-normal text-body">0 / {{course_topic.lessons.all.count}} | {{course_topic.lessons.all|total_duration|convert_minutes}}</span>
+                  <span class="h5 mb-1">{{course_topic.name}}
+                    {% with completed_lessons_count=completed_lessons_count|get_item:course_topic.id %}
+                      {% if completed_lessons_count == course_topic.lessons.all.count  and completed_lessons_count > 0%}
+                        <span class="btn-sm rounded-pill p-1 text-sm btn-success fs-6">completed</span>
+                      {% endif %}
+                    {% endwith %}
+                  </span>
+                    <span class="fw-normal text-body">{{ completed_lessons_count|get_item:course_topic.id }} / {{course_topic.lessons.all.count}} | {{course_topic.lessons.all|total_duration|convert_minutes}}</span>
                 </span>
               </button>
             </div>
@@ -175,7 +185,15 @@
                 {% for lesson in course_topic.lessons.all %}
                   {% with lesson_kount=forloop.counter %}
                   <div class="form-check d-flex align-items-center mb-3">
-                    <input class="form-check-input" type="checkbox" id="defaultCheck{{lesson_kount}}"  {% if lesson.completed %}checked=""{% endif %} />
+                    <input class="form-check-input" type="checkbox" id="defaultCheck{{lesson_kount}}"
+                      {% with user_lesson=user_lesson_dict|get_item:lesson.id %}
+                        {% if user_lesson %}
+                            {% if user_lesson.completed %}
+                              checked=""
+                            {% endif %}
+                        {% endif %}
+                      {% endwith %}
+                      />
                     <label for="defaultCheck{{lesson_kount}}" class="form-check-label ms-3">
                       <a class="mb-0 h6 {% if lesson.id == lesson_id %} text-primary {% endif %}" href="{% url 'user:lesson' course.id course_topic.id lesson.id %}">{{lesson_kount}}. {{lesson.name}}</a>
                         <span class="text-muted d-block">{{ lesson.duration|convert_minutes }}</span>
