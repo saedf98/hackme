@@ -3,7 +3,6 @@ from .views import PagesView
 from .views_misc import MiscPagesView
 
 
-
 urlpatterns = [
     path(
         "pages/account_settings/account/",
@@ -12,12 +11,14 @@ urlpatterns = [
     ),
     path(
         "pages/account_settings/notifications/",
-        PagesView.as_view(template_name="pages_account_settings_notifications.html"),
+        PagesView.as_view(
+            template_name="pages_account_settings_notifications.html"),
         name="pages-account-settings-notifications",
     ),
     path(
         "pages/account_settings/connections/",
-        PagesView.as_view(template_name="pages_account_settings_connections.html"),
+        PagesView.as_view(
+            template_name="pages_account_settings_connections.html"),
         name="pages-account-settings-connections",
     ),
     path(
@@ -27,7 +28,8 @@ urlpatterns = [
     ),
     path(
         "pages/misc/under_maintenance/",
-        MiscPagesView.as_view(template_name="pages_misc_under_maintenance.html"),
+        MiscPagesView.as_view(
+            template_name="pages_misc_under_maintenance.html"),
         name="pages-misc-under-maintenance",
     )
 ]

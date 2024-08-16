@@ -139,11 +139,10 @@
         </div>
         <div class="d-flex flex-container justify-content-center" style="">
           <input type="hidden" id="language" value="python">
-          <div id="editor" class="mt-2" style="width: 93%;height: 200px; border: 1px solid #ccc;">{% if user_exercise %}{{ user_exercise.solution }}{% else %}print("Hello, World!"){% endif %}</div>
+          <div id="editor" class="mt-2" style="width: 93%;height: 200px; border: 1px solid #ccc;">{% if user_exercise %}{{ user_exercise.solution }}{% else %}{% if form.solution.value %}{{ form.solution.value|default:"print('Hello, World!')" }}{% else %}print("Hello, World!"){% endif %}{% endif %}</div>
         </div>
         <div class="d-flex justify-content-start align-content-center">
           <button onclick="runCode()" class="btn btn-sm btn-primary m-4">Run Code</button>
-          {% comment %} <button class="btn btn-sm btn-primary m-4" id="run-code">Run Code</button> {% endcomment %}
         </div>
         <div class="d-flex justify-content-center align-content-center mb-3 mx-4" style="height: 100px">
           <div id="output"class="h-auto w-100 overflow-auto bg-secondary bg-opacity-10 p-2" ></div>
@@ -172,7 +171,13 @@
                   <span class="h5 mb-1">{{course_topic.name}}
                     {% with completed_lessons_count=completed_lessons_count|get_item:course_topic.id %}
                       {% if completed_lessons_count == course_topic.lessons.all.count  and completed_lessons_count > 0%}
-                        <span class="btn-sm rounded-pill p-1 text-sm btn-success fs-6">completed</span>
+                        {% if course_topic.course_topic_quizzes.all.count > 0 %}
+                          {% if user_course_topic_quizzes %}
+                            <span class="btn-sm rounded-pill p-1 text-sm btn-success fs-6">completed</span>
+                          {% endif %}
+                        {% else %}
+                          <span class="btn-sm rounded-pill p-1 text-sm btn-success fs-6">completed</span>
+                        {% endif %}
                       {% endif %}
                     {% endwith %}
                   </span>
@@ -208,6 +213,20 @@
                     </div>
                   </div>
                 {% endfor %}
+                {% with completed_lessons_count=completed_lessons_count|get_item:course_topic.id %}
+                  {% if completed_lessons_count == course_topic.lessons.all.count  and completed_lessons_count > 0%}
+                    {% if course_topic.course_topic_quizzes  %}
+                      <input class="form-check-input" type="checkbox" id="{{course_topic.name}}Quiz"
+                        {% if user_course_topic_quizzes %}
+                          checked
+                        {% endif %}
+                      />
+                      <label for="{{course_topic.name}}Quiz" class="form-check-label ms-3">
+                        <a class="mb-0 h6 {% if course_topic.id == course_topic_id %} text-primary {% endif %}" href="{% url 'user:course_topic_quiz' course.id course_topic.id lesson.id %}">{{course_topic.name}} Quiz</a>
+                      </label>
+                    {% endif %}
+                  {% endif %}
+                {% endwith %}
               </div>
             </div>
           </div>

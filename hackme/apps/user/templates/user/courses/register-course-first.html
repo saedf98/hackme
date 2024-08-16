@@ -4,7 +4,7 @@
 {% load i18n %}
 
 {% block title %}
-{{ 'courses.index_title'|get_config }}
+Regsiter {{ 'courses.name'|get_config }}
 {% endblock %}
 
 {% block vendor_css %}
@@ -45,7 +45,12 @@
     <div class="col-lg-8">
       <div class="d-flex justify-content-between align-items-center flex-wrap mb-2 gap-1">
         <div class="me-1">
-          <h5 class="mb-1">{{ course.name }}</h5>
+          <form action="{% url 'user:register-course' course.id %}" method="post">
+            {% csrf_token %}
+
+            <input type="hidden" name="route-name" value="register-course">
+            <button type="submit" class="w-100 btn btn-primary mb-4"> Register  {{ course.name }}</button>
+        </form>
           <p class="mb-1">Tutor. <span class="fw-medium {% random_text_color %}"> {{course.instructor.last_name}} {{course.instructor.first_name}} </span></p>
         </div>
         <div class="d-flex align-items-center">

@@ -133,3 +133,48 @@ def total_completed_lessons(lessons):
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
+
+
+@register.filter(name='to_dict')
+def to_dict(value):
+    """
+    Converts a JSON string to a dictionary.
+    """
+    if isinstance(value, str):
+        try:
+            return json.loads(value)
+        except json.JSONDecodeError:
+            return {}
+    return value
+
+
+@register.filter
+def calculate_course_topic_quiz_score(user_course_topic_quizzes, course_topic_quizzes):
+    correct_answers = 0
+    total_questions = len(course_topic_quizzes)
+
+    # Create a dictionary for easier lookup of user's answers
+    # user_answers_dict = {
+    #     quiz.course_topic_quiz_id: quiz for quiz in user_course_topic_quizzes}
+
+    for quiz in course_topic_quizzes:
+        user_quiz = user_course_topic_quizzes.get(quiz.id)
+        if user_quiz and user_quiz.answer == quiz.correct_answer:
+            correct_answers += 1
+    #  correct_answers, total_questions, (correct_answers / total_questions) * 100 if total_questions > 0 else 0
+
+    return correct_answers if total_questions > 0 else 0
+
+
+@register.filter
+def random_rating(value):
+    return round(random.uniform(3.5, 5.0), 1)
+
+
+@register.filter
+def closest_milestone(progress):
+    if progress == 0:
+        return progress
+    milestones = [25, 50, 60, 75, 100]
+    closest = min(milestones, key=lambda x: abs(x - progress))
+    return closest

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserProfileView, AdminProfileView, UserCoursesView, UserMyCoursesView, UserCourseDetailsView, UserLessonView, UserExerciseView, UserAcademicDashboardView
+from .views import UserProfileView, AdminProfileView, UserCoursesView, UserMyCoursesView, UserCourseDetailsView, UserLessonView, UserExerciseView, UserAcademicDashboardView, UserCourseTopicQuizzesView, SubmitUserCourseTopicQuizzesView, UserRegisterCourseView
 
 app_name = "user"
 
@@ -33,6 +33,12 @@ urlpatterns = [
         name="course-details",
     ),
     path(
+        "user/course/<int:id>/register",
+        UserRegisterCourseView.as_view(
+            template_name="user/courses/register-course-first.html"),
+        name="register-course-first",
+    ),
+    path(
         "user/course/<int:id>/course-topic/<int:course_topic_id>/lesson/<int:lesson_id>",
         UserLessonView.as_view(
             template_name="user/lessons/index.html"),
@@ -43,6 +49,12 @@ urlpatterns = [
         UserExerciseView.as_view(
             template_name="user/exercises/index.html"),
         name="exercise",
+    ),
+    path(
+        "user/course/<int:id>/course-topic/<int:course_topic_id>/lesson/<int:lesson_id>/quiz",
+        UserCourseTopicQuizzesView.as_view(
+            template_name="user/course_topic_quizzes/index.html"),
+        name="course_topic_quiz",
     ),
     path(
         "user/register-course/<int:course_id>",
@@ -58,6 +70,11 @@ urlpatterns = [
         "user/admin/profile",
         AdminProfileView.as_view(template_name="user/profile/index.html"),
         name="admin-profile",
+    ),
+    path(
+        "user/course-topic-quiz/submit",
+        SubmitUserCourseTopicQuizzesView.as_view(),
+        name="submit-course-topic-quiz",
     ),
     # path(
     #     "user/edit/<int:id>/",

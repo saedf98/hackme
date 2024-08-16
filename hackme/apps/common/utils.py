@@ -76,3 +76,7 @@ def convert_minutes(duration_minutes):
         return f"{hours} hour(s) {minutes} minute(s)"
     else:
         return f"{duration_minutes} minute(s)"
+
+
+def is_user_in_group(user, group_name):
+    return user.groups.filter(name=group_name).exists()

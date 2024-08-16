@@ -1,0 +1,309 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}
+{{ 'course_topic_quizzes.show_title'|get_config }}
+{% endblock %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/sweetalert2/sweetalert2.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/node-waves/node-waves.css' %}"/>
+<link rel="stylesheet" href="{% static 'vendor/libs/perfect-scrollbar/perfect-scrollbar.css' %}"/>
+<link rel="stylesheet" href="{% static 'vendor/libs/typeahead-js/typeahead.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/bs-stepper/bs-stepper.css' %}"/>
+<link rel="stylesheet" href="{% static 'vendor/libs/bootstrap-select/bootstrap-select.css' %}"/>
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/plyr/plyr.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/%40form-validation/form-validation.css' %}" />
+{% comment %} <script src="jquery-3.7.1.min.js"></script> {% endcomment %}
+{% endblock vendor_css %}
+
+{% block page_css %}
+{{ block.super }}
+<link rel="stylesheet"  href="{% static 'vendor/css/pages/app-course-details.css' %}"/>
+{% endblock page_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/bs-stepper/bs-stepper.js' %}"></script>
+<script src="{% static 'vendor/libs/bootstrap-select/bootstrap-select.js' %}"></script>
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+<script src="{% static 'vendor/libs/%40form-validation/popular.js' %}"></script>
+<script src="{% static 'vendor/libs/%40form-validation/bootstrap5.js' %}"></script>
+<script src="{% static 'vendor/libs/%40form-validation/auto-focus.js' %}"></script>
+<script src="{% static 'vendor/libs/perfect-scrollbar/perfect-scrollbar.js' %}"></script>
+<!-- Form Validation -->
+<script src="{% static 'vendor/libs/sweetalert2/sweetalert2.js' %}"></script>
+<script src="{% static 'vendor/libs/plyr/plyr.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_js %}
+{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+<script src="{% static 'js/extended-ui-perfect-scrollbar.js' %}"></script>
+<script src="{% static  'js/form-wizard-numbered.js' %}"></script>
+<script src="{% static  'js/form-wizard-validation.js' %}"></script>
+{% endblock page_js %}
+
+{% block content %}
+
+<div class="card g-3 mt-2">
+  <div class="card-body row g-3">
+    <div class="col-lg-8">
+      <div class="d-flex justify-content-between align-items-center flex-wrap mb-2 gap-1">
+        <div class="me-1">
+          <h5 class="mb-1">{{ course.name }}</h5>
+          <p class="mb-1">Tutor. <span class="fw-medium {% random_text_color %}"> {{course.instructor.last_name}} {{course.instructor.first_name}} </span></p>
+        </div>
+        <div class="d-flex align-items-center">
+          <span class="badge {% random_bg_label_color %}">{{ course.content_type|remove_before_vertical_bar }}</span>
+          <i class='ti ti-share ti-sm mx-4 cursor-pointer'></i>
+          <i class='ti ti-bookmarks ti-sm cursor-pointer'></i>
+        </div>
+      </div>
+
+      <div class="card exercise-content shadow-none border mt-2 mt-md-3">
+
+        <div class="d-flex flex-column flex-container justify-content-start">
+          <div class="m-3">
+            <h4>Quiz</h4>
+          </div>
+          {% if messages %}
+              <div class="messages mx-3">
+                  {% for message in messages %}
+                  <div {% if message.tags %} class="{{ message.tags }}" {% endif %}
+                    role="alert">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                      aria-label="Close"
+                    ></button>
+                    {{ message|escape }}
+                    {% comment %} <strong>{{ message }}</strong> {% endcomment %}
+                  </div>
+                  {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="d-flex flex-container justify-content-center" style="">
+          <div class="col-12 mb-4">
+            <div class="bs-stepper wizard-numbered" id="wizard-validation">
+              <div class="bs-stepper-header">
+                <div class="text-wrap">
+                  {% for course_topic_quiz in course_topic.course_topic_quizzes.all %}
+                    {% with course_topic_quiz_kount=forloop.counter %}
+                      <span class="step"
+                      data-target="#course_topic_quiz_{{course_topic_quiz_kount}}">
+                        <button type="button" class="step-trigger" role="tab" aria-controls="course_topic_quiz_{{course_topic_quiz_kount}}" id="course_topic_quiz_{{course_topic_quiz_kount}}-trigger" disabled>
+                          <span class="bs-stepper-circle">{{course_topic_quiz_kount}}</span>
+                        </button>
+                      </span>
+                    {% endwith %}
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="bs-stepper-content">
+                <form method="POST" id="wizard-validation-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="course_topic_id" value="{{ course_topic_id }}">
+                  <input type="hidden" name="course_id" value="{{ course_topic.id }}">
+                  <div id="validation-message" class="alert alert-danger alert-dismissible d-none fade show mb-3" role="alert">
+                    <div> ⚠️ Please select an option before proceeding.</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+                  <div class="row my-2">
+                    {% if user_course_topic_quizzes %}
+                      {% with user_score=user_course_topic_quizzes|calculate_course_topic_quiz_score:course_topic.course_topic_quizzes.all %}
+                      <div>Score: <span
+                        {% if user_score < 5 %}
+                          class="text-danger"
+                        {% elif user_score > 5 %}
+                          class="text-success"
+                        {% else %}
+                          class="text-primary"
+                        {% endif %}
+                        >{{ user_score }} / {{course_topic.course_topic_quizzes.all.count}}</span></div>
+                      {% endwith %}
+                    {% endif %}
+                  </div>
+                  {% for course_topic_quiz in course_topic.course_topic_quizzes.all %}
+                    {% with course_topic_quiz_kount=forloop.counter %}
+                      {% with user_course_topic_quiz=user_course_topic_quizzes|get_item:course_topic_quiz.id %}
+                        <div id="course_topic_quiz_{{course_topic_quiz_kount}}" class="content">
+                          <div class="content-header mb-3">
+                            <h6 class="mb-0">{{course_topic_quiz.question}}</h6>
+                            <small>
+                              <a href="{% url 'common:editor' %}" target="_blank" rel="noopener noreferrer">
+                                Use online code editor
+                              </a>
+                            </small>
+                          </div>
+                          <div class="row g-3">
+                            <div class="col-sm-12">
+                              {% with course_topic_quiz.options|to_dict as options_dict %}
+                                {% for key, value in options_dict.items %}
+                                  <div class="form-check">
+                                      <input
+                                        class="form-check-input"
+                                        type="radio"
+                                        id="option-{{ key }}-{{course_topic_quiz_kount}}"
+                                        name="{{course_topic_quiz.id}}"
+                                        value="{{ key }}"
+                                        {% if user_course_topic_quiz %}
+                                          {% if user_course_topic_quiz.answer == key %}
+                                            checked
+                                          {% endif %}
+                                        {% endif %}
+                                        >
+                                      <label
+                                        for="option-{{ key }}-{{course_topic_quiz_kount}}"
+                                        class="form-check-label" >
+                                        {{ key|upper }}: {{ value }}
+                                      </label>
+                                      {% if user_course_topic_quiz %}
+                                          {% if course_topic_quiz.correct_answer == key and user_course_topic_quiz.answer == key %}
+                                            ✅
+                                          {% else %}
+                                            {% if user_course_topic_quiz.answer == key %}
+                                              ❌
+                                            {% endif %}
+                                          {% endif %}
+                                      {% endif %}
+                                  </div>
+                                {% endfor %}
+                              {% endwith %}
+                            </div>
+                            {% if user_course_topic_quiz %}
+                              <div class="">
+                                <span><strong>Your Answer:</strong> {{ user_course_topic_quiz.answer|upper }}</span><br>
+                                <span class="text-success"><strong>Correct Answer:</strong> {{ course_topic_quiz.correct_answer|upper }}</span>
+                              </div>
+                            {% endif %}
+                            <div class="col-12 d-flex justify-content-between">
+                              <button type="button" class="btn btn-label-secondary btn-prev"
+                                {% if course_topic_quiz_kount == 1%} disabled {% endif %}>
+                                <i class="ti ti-arrow-left me-sm-1 me-0"></i>
+                                <span class="align-middle d-sm-inline-block d-none">Previous</span>
+                              </button>
+                                {{course_topic_quiz_kount}} /
+                                {{course_topic.course_topic_quizzes.all.count}}
+                                {% if course_topic_quiz_kount == course_topic.course_topic_quizzes.all.count%}
+                                  {% if not user_course_topic_quiz %}
+                                    <button type="submit" class="btn btn-success btn-submit">
+                                      Submit
+                                    </button>
+                                  {% else %}
+                                    <button type="button" class="btn btn-primary">
+                                      End
+                                    </button>
+                                  {% endif %}
+                              {% else %}
+                                  <button type="button" class="btn btn-primary btn-next">
+                                    <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
+                                    <i class="ti ti-arrow-right"></i>
+                                  </button>
+                              {% endif %}
+                            </div>
+                          </div>
+                        </div>
+                      {% endwith %}
+                    {% endwith %}
+                  {% endfor %}
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="accordion stick-top accordion-bordered" id="courseContent">
+        {% for course_topic in course_topics %}
+        {% with kount=forloop.counter|number_to_words %}
+          <div class="accordion-item {% if course_topic.id == course_topic_id %} active {% endif %} mb-0">
+            <div class="accordion-header" id="heading{{kount}}">
+              <button type="button" class="accordion-button bg-lighter rounded-0 {% if course_topic.id == course_topic_id %} collapsed {% endif %}" data-bs-toggle="collapse" data-bs-target="#chapter{{kount}}" aria-expanded="{% if kount == "One" %} true {% else %} false {% endif %}" aria-controls="chapter{{kount}}">
+                <span class="d-flex flex-column">
+                  <span class="h5 mb-1">{{course_topic.name}}
+                    {% with completed_lessons_count=completed_lessons_count|get_item:course_topic.id %}
+                      {% if completed_lessons_count == course_topic.lessons.all.count  and completed_lessons_count > 0%}
+                        {% if course_topic.course_topic_quizzes.all.count > 0 %}
+                          {% if user_course_topic_quizzes %}
+                            <span class="btn-sm rounded-pill p-1 text-sm btn-success fs-6">completed</span>
+                          {% endif %}
+                        {% else %}
+                          <span class="btn-sm rounded-pill p-1 text-sm btn-success fs-6">completed</span>
+                        {% endif %}
+                      {% endif %}
+                    {% endwith %}
+                  </span>
+                    <span class="fw-normal text-body">{{ completed_lessons_count|get_item:course_topic.id }} / {{course_topic.lessons.all.count}} | {{course_topic.lessons.all|total_duration|convert_minutes}}</span>
+                </span>
+              </button>
+            </div>
+            <div id="chapter{{kount}}" class="accordion-collapse collapse {% if course_topic.id == course_topic_id %} show {% endif %}" data-bs-parent="#courseContent">
+              <div class="accordion-body py-3 border-top">
+                {% for lesson in course_topic.lessons.all %}
+                  {% with lesson_kount=forloop.counter %}
+                  <div class="form-check d-flex align-items-center mb-3">
+                    <input class="form-check-input" type="checkbox" id="defaultCheck{{lesson_kount}}"
+                      {% with user_lesson=user_lesson_dict|get_item:lesson.id %}
+                        {% if user_lesson %}
+                            {% if user_lesson.completed %}
+                              checked=""
+                            {% endif %}
+                        {% endif %}
+                      {% endwith %}
+                      />
+                    <label for="defaultCheck{{lesson_kount}}" class="form-check-label ms-3">
+                      <a class="mb-0 h6" href="{% url 'user:lesson' course.id course_topic.id lesson.id %}">{{lesson_kount}}. {{lesson.name}}</a>
+                        <span class="text-muted d-block">{{ lesson.duration|convert_minutes }}</span>
+                    </label>
+                  </div>
+                  {% endwith %}
+                  {% empty %}
+                  <div class="form-check d-flex align-items-center mb-3">
+                    <div class="">
+                      <span class="mb-0 h6">No lesson available in this course topic yet</span>
+                      <span class="text-muted d-block">N/A</span>
+                    </div>
+                  </div>
+                {% endfor %}
+                {% with completed_lessons_count=completed_lessons_count|get_item:course_topic.id %}
+                  {% if completed_lessons_count == course_topic.lessons.all.count  and completed_lessons_count > 0%}
+                    {% if course_topic.course_topic_quizzes  %}
+                      <input class="form-check-input" type="checkbox" id="{{course_topic.name}}Quiz"
+                        {% if user_course_topic_quizzes %}
+                          checked
+                        {% endif %}
+                      />
+                      <label for="{{course_topic.name}}Quiz" class="form-check-label ms-3">
+                        <a class="mb-0 h6 {% if course_topic.id == course_topic_id %} text-primary {% endif %}" href="{% url 'user:course_topic_quiz' course.id course_topic.id lesson.id %}">{{course_topic.name}} Quiz</a>
+                      </label>
+                    {% endif %}
+                  {% endif %}
+                {% endwith %}
+              </div>
+            </div>
+          </div>
+        {% endwith %}
+        {% empty %}
+          <div class="accordion-item mb-0">
+            <div class="accordion-header" id="headingOne">
+              <button type="button" class="bg-lighter rounded-0 accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#chapterOne" aria-expanded="false" aria-controls="chapterOne">
+                <span class="d-flex flex-column">
+                  <span class="h5 mb-1">No course topic is available in this course yet </span>
+                  <span class="fw-normal text-body">N/A</span>
+                </span>
+              </button>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

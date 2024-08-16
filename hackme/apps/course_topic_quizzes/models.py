@@ -7,8 +7,14 @@ from apps.courses.models import Course
 
 # Create your models here.
 class CourseTopicQuiz(Quiz):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    course_topic = models.ForeignKey(CourseTopic, on_delete=models.CASCADE)
+    course = models.ForeignKey(
+        Course,
+        related_name='course_topic_quizzes',
+        on_delete=models.CASCADE)
+    course_topic = models.ForeignKey(
+        CourseTopic,
+        related_name='course_topic_quizzes',
+        on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'course_topic_quizzes'

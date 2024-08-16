@@ -154,7 +154,7 @@
                   <h6
                     class="d-flex align-items-center justify-content-center gap-1 mb-0"
                   >
-                    4.4
+                  {{0|random_rating}}
                     <span class="text-warning">
                       <i class="ti ti-star-filled me-1 mt-n1"></i>
                     </span>
@@ -168,13 +168,13 @@
                   {{ course.description|truncate_71 }}
                 </p>
                 <p><span class="badge {% random_bg_label_color %}">{{ course.content_type|remove_before_vertical_bar }} </span></p>
-                {% with completed=registered_courses|get_item:course.id %}
-                  {% if completed is not None %}
+                {% with registered=registered_courses|get_item:course.id %}
+                  {% if registered %}
                     <form action="{% url 'user:register-course' course.id %}" id="start-over-form" method="post" style="display:none">
                       {% csrf_token %}
                       <input type="hidden" name="route-name" value="start-over">
                     </form>
-                    {% if completed %}
+                    {% if registered and registered.completed %}
                       <p class="d-flex align-items-center">
                         <i class="bx bx-check me-1"></i>Completed
                       </p>
@@ -190,16 +190,23 @@
                         <button class="w-100 btn btn-label-primary start-over-btn"><i class="ti ti-rotate-clockwise-2 align-middle scaleX-n1-rtl me-2 mt-n1 ti-s"></i>Start Over</button>
                     {% else %}
                         <p class="d-flex align-items-center">
-                          <i class="ti ti-clock me-2 mt-n1"></i>30 minutes
+                          <i class="ti ti-clock me-2 mt-n1"></i>{{ courses_duration|get_item:course.id|convert_minutes }}
                         </p>
                         <div class="progress mb-4" style="height: 8px">
-                          <div
-                            class="progress-bar w-0"
-                            role="progressbar"
-                            aria-valuenow="25"
-                            aria-valuemin="0"
-                            aria-valuemax="100"
-                          ></div>
+                          {% with user_course=user_courses_dict|get_item:course.id %}
+                            <div
+                              {% if user_course %}
+                                class="progress-bar w-{{user_course.progress|closest_milestone}}"
+                                aria-valuenow="{{user_course.progress|closest_milestone}}"
+                              {% else %}
+                                class="progress-bar w-0"
+                                aria-valuenow="0"
+                              {% endif %}
+                              role="progressbar"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                              ></div>
+                            {% endwith %}
                         </div>
                         <div class="d-flex flex-column flex-md-row gap-2 text-nowrap">
                           <button class="app-academy-md-50 btn btn-outline-secondary me-md-2 d-flex align-items-center start-over-btn">
@@ -214,13 +221,13 @@
                     {% endif %}
                   {% else %}
                       <p class="d-flex align-items-center">
-                        <i class="ti ti-clock me-2 mt-n1"></i>30 minutes
+                        <i class="ti ti-clock me-2 mt-n1"></i>{{ courses_duration|get_item:course.id|convert_minutes }}
                       </p>
                       <div class="progress mb-4" style="height: 8px">
                         <div
                           class="progress-bar w-0"
                           role="progressbar"
-                          aria-valuenow="25"
+                          aria-valuenow="0"
                           aria-valuemin="0"
                           aria-valuemax="100"
                         ></div>

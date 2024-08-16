@@ -1,6 +1,9 @@
 
+from django.shortcuts import redirect
+from apps.courses.models import Course
 from apps.course_topics.models import CourseTopic
-from apps.user_progress.models import UserExercises, UserLessons, UserCourses
+from apps.course_topic_quizzes.models import CourseTopicQuiz
+from apps.user_progress.models import UserExercises, UserLessons, UserCourses, UserCourseTopicQuizzes
 
 
 def create_user_lesson(user, lesson, progress=0, completed=False):
@@ -73,7 +76,7 @@ def get_registered_courses(user):
     """
     user_courses = UserCourses.objects.filter(user=user)
     registered_courses = {
-        user_course.course_id: user_course.completed for user_course in user_courses}
+        user_course.course_id: user_course for user_course in user_courses}
     return registered_courses
 
 
@@ -93,3 +96,61 @@ def format_number(num):
     elif num >= 1000:
         return f'{num / 1000:.2f}k'
     return str(num)
+
+
+def get_course_topic_quiz_ids(course_id, course_topic_id):
+    quizzes = CourseTopicQuiz.objects.filter(
+        course=course_id,
+        course_topic=course_topic_id
+    )
+    quiz_ids = quizzes.values_list('id', flat=True)
+    return quiz_ids
+
+
+def get_user_course_topic_quizzes(user, course_id, course_topic_id):
+    quiz_ids = get_course_topic_quiz_ids(course_id, course_topic_id)
+    user_course_topic_quizzes = UserCourseTopicQuizzes.objects.filter(
+        user=user,
+        course_topic_quiz__in=quiz_ids
+    )
+    user_course_topic_quizzes = {
+        quiz.course_topic_quiz_id: quiz for quiz in user_course_topic_quizzes}
+    return user_course_topic_quizzes
+
+
+def get_courses_total_duration():
+    from django.db.models import Sum
+    courses = Course.objects.all()
+    courses_duration = {}
+
+    for course in courses:
+        total_duration = course.lessons.aggregate(
+            Sum('duration'))['duration__sum'] or 0
+        courses_duration[course.id] = total_duration
+
+    return courses_duration
+
+
+def get_user_courses(user):
+    user_courses = UserCourses.objects.filter(
+        user=user).select_related('course')
+
+    return user_courses
+
+
+def get_user_courses_dict(user):
+    user_courses = get_user_courses(user)
+
+    courses_dict = {
+        user_course.course_id: user_course for user_course in user_courses}
+
+    return courses_dict
+
+
+def is_user_in_group(user, group_name):
+    return user.groups.filter(name=group_name).exists()
+
+
+def check_course_registration(request, course_id):
+    user = request.user
+    return UserCourses.objects.filter(user=user, course_id=course_id).exists()

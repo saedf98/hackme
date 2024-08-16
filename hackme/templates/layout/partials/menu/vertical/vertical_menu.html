@@ -24,14 +24,6 @@
 
   <!--TODO(toheeb): look into the dashboard and fix this for different user roles -->
   <ul class="menu-inner py-1">
-    {% comment %} <li class="menu-item {% if 'index' == request.resolver_match.url_name or '/dashboard/' in request.path %}active{% endif %}">
-      <a href="{% url 'dashboard' %}" class="menu-link">
-        <i class="menu-icon tf-icons bx bx-home-circle"></i>
-        <div class="text-truncate" data-i18n="Dashboards">
-          Dashboard
-        </div>
-      </a>
-    </li> {% endcomment %}
 
     {% comment %} {{request.path}} {% endcomment %}
     {% comment %} {{request.resolver_match.url_name}} {% endcomment %}
@@ -40,7 +32,8 @@
       {% comment %} <li class="menu-header small text-uppercase">
         <span class="menu-header-text">Admin / Instructor</span>
       </li> {% endcomment %}
-      <li class="menu-item  {% if 'index' == request.resolver_match.url_name or '/dashboard/' in request.path %}active{% endif %}">
+
+      <li class="menu-item  {% if 'dashboard' == request.resolver_match.url_name or '/dashboard/' in request.path %}active{% endif %}">
         <a href="{% url 'dashboard' %}" class="menu-link">
             <i class="menu-icon tf-icons bx bx-home-circle"></i>
             <div class="text-truncate" data-i18n="Dashboard">
@@ -407,6 +400,7 @@
     {% comment %} <li class="menu-header small text-uppercase">
       <span class="menu-header-text">User</span>
     </li> {% endcomment %}
+
     <li class="menu-item {% if 'dashboard' == request.resolver_match.url_name or '/user/dashboard' in request.path %}active{% endif %}">
       <a href="{% url 'user:dashboard' %}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-home-circle"></i>

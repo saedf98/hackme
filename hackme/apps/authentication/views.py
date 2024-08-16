@@ -5,7 +5,9 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from web_project import TemplateLayout
 from apps.common.utils import get_url
+from django.contrib.auth.models import Group
 from django.views.generic import TemplateView
+from apps.common.utils import is_user_in_group
 from apps.users.models import User, UserProfile
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
@@ -34,7 +36,11 @@ class AuthView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect('dashboard')
+            if is_user_in_group(request.user, 'user'):
+                redirect_url = redirect('user:dashboard')
+            else:
+                redirect_url = redirect("dashboard")
+            return redirect_url
         return super().get(request, *args, **kwargs)
 
     def verify_email(request, token):
@@ -45,14 +51,14 @@ class AuthView(TemplateView):
             messages.success(
                 request, 'Email Verified Successfully.',
                 extra_tags='alert alert-success alert-dismissible fade show')
-            redirect_url = 'dashboard'
+            redirect_url = 'user:dashboard'
         except UserProfile.DoesNotExist:
             messages.error(
                 request, 'Invalid verification, please try again.',
                 extra_tags='alert alert-danger alert-dismissible fade show')
             redirect_url = 'auth:login'
 
-        return redirect(reverse(redirect_url))
+        return redirect(redirect_url)
 
     @login_required()
     def logout_user(request):
@@ -73,7 +79,11 @@ class LoginAuthView(AuthView):
             if user.profile.email_verified:
                 login(request, user)
                 # redirect_url = request.GET.get('next', 'home')
-                redirect_url = request.POST.get('next') or 'index'
+                if is_user_in_group(request.user, 'user'):
+                    dashboard = 'user:dashboard'
+                else:
+                    dashboard = "dashboard"
+                redirect_url = request.POST.get('next') or dashboard
             else:
                 messages.error(request, f"Please verify your account <a href='{get_url('auth:resend_email_verification')}'>click here</a> !",
                                extra_tags='alert alert-danger alert-dismissible fade show')
@@ -120,7 +130,9 @@ class RegisterAuthView(AuthView):
             messages.success(
                 request, f'Thanks for registering {user.username}, Please check your mail inbox to verify your account.',
                 extra_tags='alert alert-success alert-dismissible fade show')
-            user.groups.add('user')
+            user_group = Group.objects.get(name='user')
+            print(user_group)
+            user.groups.add(user_group)
             redirect_url = reverse('auth:login')
 
         return redirect(redirect_url)

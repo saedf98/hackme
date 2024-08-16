@@ -1,18 +1,24 @@
+from apps.user_progress.models import UserCourses, UserExercises, UserCourseTopics, UserLessons, UserCourseQuizzes, UserCourseTopicQuizzes, UserLessonQuizzes
+import json
+from django.http import JsonResponse
 from django.urls import reverse
 from django.db import transaction
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
+
 from .forms import LessonExerciseForm
 from apps.lessons.models import Lesson
 from apps.courses.models import Course
 from django.views.generic import ListView
 from apps.exercises.models import Exercise
-from apps.common.views import UserDashboardView, DashboardView
+from apps.course_topics.models import CourseTopic
 from django.shortcuts import get_object_or_404, redirect
+from apps.common.mixins import CourseRegistrationRequiredMixin
+from apps.common.views import UserDashboardView, DashboardView
+from apps.course_topic_quizzes.models import CourseTopicQuiz
 from django.contrib.contenttypes.models import ContentType
-from .utils import create_user_exercise, create_user_lesson, get_completed_lessons_count, get_user_lesson_dict, get_registered_courses, count_users_registered_for_course, format_number
-from apps.user_progress.models import UserCourses, UserExercises, UserCourseTopics, UserLessons, UserCourseQuizzes, UserCourseTopicQuizzes, UserLessonQuizzes
+from .utils import create_user_exercise, create_user_lesson, get_completed_lessons_count, get_user_lesson_dict, get_registered_courses, count_users_registered_for_course, format_number, get_user_course_topic_quizzes, get_courses_total_duration, get_user_courses, get_user_courses_dict, check_course_registration
 
 
 # Create your views here.
@@ -86,6 +92,8 @@ class UserCoursesView(UserDashboardView, ListView):
                       'hashing_algorithms', 'digital_forensics']
         model_names = ['encryptiontechnique',
                        'hashingalgorithm', 'digitalforensic']
+        courses_duration = get_courses_total_duration()
+        user_courses_dict = get_user_courses_dict(self.request.user)
         course_content_types = ContentType.objects.filter(
             app_label__in=app_labels,
             model__in=model_names
@@ -98,9 +106,11 @@ class UserCoursesView(UserDashboardView, ListView):
         context.update({
             "additional_data": "This is some additional data for MyView",
             "course_count": course_count,
-            "course_content_types": course_content_types,
+            "courses_duration": courses_duration,
+            "user_courses_dict": user_courses_dict,
             "registered_courses": registered_courses,
-            "course_user_counts": course_user_counts
+            "course_user_counts": course_user_counts,
+            "course_content_types": course_content_types,
         })
 
         return context
@@ -151,9 +161,13 @@ class UserMyCoursesView(UserDashboardView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        courses_duration = get_courses_total_duration()
+        my_courses = get_user_courses(self.request.user)
 
         # Add more data to the context specific to this view
         context.update({
+            "my_courses": my_courses,
+            "courses_duration": courses_duration,
             "additional_data": "This is some additional data for MyView",
         })
 
@@ -185,7 +199,37 @@ class UserCourseTopicsView(UserDashboardView):
         return context
 
 
-class UserCourseDetailsView(UserCourseTopicsView):
+class UserRegisterCourseView(UserDashboardView):
+    model = Course
+    context_object_name = 'courses'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        course_id = self.kwargs.get('id')
+        course = Course.objects.get(pk=course_id)
+        course_topics = course.course_topics.all()
+        users_count = UserCourses.objects.filter(course=course).count()
+        lessons_count = Lesson.objects.filter(course=course).count()
+        total_duration = sum(
+            lesson.duration for lesson in course.lessons.all())
+        completed_lessons_count = get_completed_lessons_count(
+            self.request.user, course_id)
+        user_lesson_dict = get_user_lesson_dict(self.request.user)
+
+        context.update({
+            "course": course,
+            "lessons_count": lessons_count,
+            "course_topics": course_topics,
+            "users_count": users_count,
+            "total_duration": total_duration,
+            "user_lesson_dict": user_lesson_dict,
+            'completed_lessons_count': completed_lessons_count,
+        })
+
+        return context
+
+
+class UserCourseDetailsView(CourseRegistrationRequiredMixin, UserCourseTopicsView):
     model = Course
     context_object_name = 'courses'
 
@@ -195,7 +239,7 @@ class UserCourseDetailsView(UserCourseTopicsView):
         completed_lessons_count = get_completed_lessons_count(
             self.request.user, course_id)
         user_lesson_dict = get_user_lesson_dict(self.request.user)
-
+        print(check_course_registration(self.request, course_id))
         context.update({
             "user_lesson_dict": user_lesson_dict,
             'completed_lessons_count': completed_lessons_count,
@@ -204,7 +248,7 @@ class UserCourseDetailsView(UserCourseTopicsView):
         return context
 
 
-class UserLessonView(UserCourseTopicsView):
+class UserLessonView(CourseRegistrationRequiredMixin, UserCourseTopicsView):
     model = Lesson
     context_object_name = 'lessons'
 
@@ -217,7 +261,10 @@ class UserLessonView(UserCourseTopicsView):
         exercise = Exercise.objects.get(
             lesson=lesson_id,
             course=course_id)
-
+        user_course_topic_quizzes = get_user_course_topic_quizzes(
+            self.request.user,
+            course_id,
+            course_topic_id)
         completed_lessons_count = get_completed_lessons_count(
             self.request.user, course_id)
         user_lesson_dict = get_user_lesson_dict(self.request.user)
@@ -234,12 +281,13 @@ class UserLessonView(UserCourseTopicsView):
             "course_topic_id": course_topic_id,
             "user_lesson_dict": user_lesson_dict,
             'completed_lessons_count': completed_lessons_count,
+            'user_course_topic_quizzes': user_course_topic_quizzes
         })
 
         return context
 
 
-class UserExerciseView(UserCourseTopicsView):
+class UserExerciseView(CourseRegistrationRequiredMixin, UserCourseTopicsView):
     model = Exercise
     context_object_name = 'exercises'
 
@@ -252,6 +300,10 @@ class UserExerciseView(UserCourseTopicsView):
         exercise = Exercise.objects.get(
             lesson=lesson_id,
             course=course_id)
+        user_course_topic_quizzes = get_user_course_topic_quizzes(
+            self.request.user,
+            course_id,
+            course_topic_id)
 
         completed_lessons_count = get_completed_lessons_count(
             self.request.user, course_id)
@@ -269,7 +321,8 @@ class UserExerciseView(UserCourseTopicsView):
             "user_exercise": user_exercise,
             "course_topic_id": course_topic_id,
             "user_lesson_dict": user_lesson_dict,
-            'completed_lessons_count': completed_lessons_count
+            'completed_lessons_count': completed_lessons_count,
+            'user_course_topic_quizzes': user_course_topic_quizzes
         })
 
         return context
@@ -294,6 +347,7 @@ class UserExerciseView(UserCourseTopicsView):
                 # TODO: check if solution is correct, if yes, mark lesson and exercise for user as completed
                 # and save users solution
             elif exercise.answer == solution_output:
+
                 user_lesson, lesson_created = create_user_lesson(
                     user=request.user,
                     lesson=exercise.lesson,
@@ -320,6 +374,120 @@ class UserExerciseView(UserCourseTopicsView):
         messages.error(
             request, "Please solve the exercise before submission!",
             extra_tags='alert alert-danger alert-dismissible fade show')
+        self.get_context_data(form=lesson_exercise_form)
 
         return redirect(redirect_url)
-        # return HttpResponseRedirect("")
+
+
+class UserCourseTopicQuizzesView(CourseRegistrationRequiredMixin, UserCourseTopicsView):
+    model = CourseTopicQuiz
+    context_object_name = 'course_topic_quizzes'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        course_id = self.kwargs.get('id')
+        course_topic_id = self.kwargs.get('course_topic_id')
+        lesson_id = self.kwargs.get('lesson_id')
+        lesson = Lesson.objects.get(pk=lesson_id)
+        course_topic = CourseTopic.objects.get(pk=course_topic_id)
+        user_course_topic_quizzes = get_user_course_topic_quizzes(
+            self.request.user,
+            course_id,
+            course_topic_id)
+        exercise = Exercise.objects.get(
+            lesson=lesson_id,
+            course=course_id)
+
+        completed_lessons_count = get_completed_lessons_count(
+            self.request.user, course_id)
+        user_lesson_dict = get_user_lesson_dict(self.request.user)
+
+        if self.request.user.is_authenticated:
+            user_exercise = UserExercises.objects.filter(
+                user=self.request.user, exercise=exercise).first()
+
+        # Add more data to the context specific to this view
+        context.update({
+            "lesson": lesson,
+            "exercise": exercise,
+            "lesson_id": lesson_id,
+            "course_topic": course_topic,
+            "user_exercise": user_exercise,
+            "course_topic_id": course_topic_id,
+            "user_lesson_dict": user_lesson_dict,
+            'completed_lessons_count': completed_lessons_count,
+            'user_course_topic_quizzes': user_course_topic_quizzes
+        })
+
+        return context
+
+
+class SubmitUserCourseTopicQuizzesView(UserCourseTopicsView):
+    def post(self, request, *args, **kwargs):
+
+        try:
+            data = json.loads(request.body)
+            # print(data)
+        except json.JSONDecodeError:
+            return JsonResponse({"status": "error", "message": "Invalid JSON format"}, status=400)
+
+        # Add all required keys here
+        required_keys = ["course_topic_id", "course_id"]
+        missing_keys = [key for key in required_keys if key not in {
+            list(item.keys())[0] for item in data}]
+
+        if missing_keys:
+            return JsonResponse({"status": "error", "message": f"Missing parameters: {', '.join(missing_keys)}"}, status=400)
+
+        try:
+            keys_to_remove = {'csrfmiddlewaretoken',
+                              'course_topic_id', 'course_id'}
+            filtered_data = []
+            for item in data:
+                filtered_item = {key: value for key,
+                                 value in item.items() if key not in keys_to_remove}
+                if filtered_item:
+                    filtered_data.append(filtered_item)
+
+            course_topic_quiz_ids = [list(item.keys())[0]
+                                     for item in filtered_data]
+            course_topic_quizzes = CourseTopicQuiz.objects.filter(
+                pk__in=course_topic_quiz_ids)
+
+            course_topic_quiz_dict = {
+                quiz.pk: quiz for quiz in course_topic_quizzes}
+
+            # Process and save data to the database
+            user = request.user
+            user_course_topic_quizzes = []
+            for item in filtered_data:
+                key = list(item.keys())[0]
+                value = item[key]
+                course_topic_quiz = course_topic_quiz_dict.get(int(key))
+
+                if value == course_topic_quiz.correct_answer:
+                    score = 1
+                else:
+                    score = 0
+
+                user_course_topic_quiz = UserCourseTopicQuizzes(
+                    user=user,
+                    score=score,
+                    answer=value,
+                    completed=True,
+                    course_topic_quiz=course_topic_quiz,
+                )
+                user_course_topic_quizzes.append(user_course_topic_quiz)
+                # print(f"Saving {key}: {value}")
+            print(course_topic_quiz_ids)
+            if user_course_topic_quizzes:
+                with transaction.atomic():  # Ensure atomicity
+                    UserCourseTopicQuizzes.objects.filter(
+                        course_topic_quiz_id__in=course_topic_quiz_ids
+                    ).delete()
+                    UserCourseTopicQuizzes.objects.bulk_create(
+                        user_course_topic_quizzes)
+
+            return JsonResponse({"status": "success", "message": f"Quizzes successfully saved"})
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
