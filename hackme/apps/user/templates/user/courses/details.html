@@ -86,7 +86,7 @@
           <h5>Instructor</h5>
           <div class="d-flex justify-content-start align-items-center user-name">
             <div class="avatar-wrapper">
-              <div class="avatar me-2"><img src="{% static 'img/avatars/1.png' %}" alt="Avatar" class="rounded-circle"></div>
+              <div class="avatar me-2"><img src="{{ course.instructor|profile_picture_url }}" alt="Avatar" class="rounded-circle"></div>
             </div>
             <div class="d-flex flex-column">
               <span class="fw-medium">{{course.instructor.last_name}} {{course.instructor.first_name}}</span>

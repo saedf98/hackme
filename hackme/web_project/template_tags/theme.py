@@ -1,6 +1,7 @@
 import random
 import inflect
 from word2number import w2n
+from django.templatetags.static import static
 from django.utils.safestring import mark_safe
 from django import template
 from apps.common.utils import get_config_value
@@ -178,3 +179,46 @@ def closest_milestone(progress):
     milestones = [25, 50, 60, 75, 100]
     closest = min(milestones, key=lambda x: abs(x - progress))
     return closest
+
+
+@register.filter
+def profile_picture_url(user):
+    if user.profile.profile_picture:
+        return user.profile.profile_picture.url
+    else:
+        return static('img/avatars/1.png')
+
+
+def random_color():
+    return "#{:06x}".format(random.randint(0, 0xFFFFFF))
+
+
+@register.filter
+def truncate(value, limit=15):
+    """Returns the first 71 characters of the value, appending '...' if truncated"""
+    if len(value) > limit:
+        return value[:limit - 3] + '...'
+    return value[:limit]
+
+
+@register.filter
+def course_image_url(course):
+    if course.image:
+        return course.image.url
+    else:
+        color = random_color()
+        text = truncate(course.name)
+        return f"https://via.placeholder.com/640x400.png/{color}?text={text}"
+
+
+@register.filter(name='transform_label')
+def transform_label(value):
+    try:
+        # Split the input string by '.'
+        app_label, model_name = value.split('.')
+        # Remove underscores and capitalize the first letter
+        transformed_label = app_label.replace('_', ' ').capitalize()
+        return transformed_label
+    except ValueError:
+        # Return the original value if splitting or transformation fails
+        return value

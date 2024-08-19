@@ -43,7 +43,7 @@
       </li>
 
       <li
-        class="menu-item {% if '/levels/' in request.path %}active open{% endif %}">
+        class="menu-item {% if '/levels/' in request.path or '/level' in request.path %}active open{% endif %}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
           <i class="menu-icon tf-icons bx bx-dock-top"></i>
           <div class="text-truncate" data-i18n="Levels">
@@ -76,8 +76,7 @@
         </ul>
       </li>
 
-      <li
-        class="menu-item {% if '/users/' in request.path %}active open{% endif %}">
+      <li class="menu-item {% if '/users/' in request.path %}active open{% endif %}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
           <i class="menu-icon tf-icons bx bx-group"></i>
           <div class="text-truncate" data-i18n="Users">
@@ -85,23 +84,13 @@
           </div>
         </a>
         <ul class="menu-sub">
-          <li
-            class="menu-item {% if '/users/' in request.path %}active{% endif %}"
-          >
-            <a
-              href="{% url 'users:index' %}"
-              class="menu-link"
-            >
+          <li class="menu-item {% if '/users/' in request.path %}active{% endif %}">
+            <a href="{% url 'users:index' %}" class="menu-link">
               <div class="text-truncate" data-i18n="Users">Users</div>
             </a>
           </li>
-          <li
-            class="menu-item {% if '/users/create/' in request.path %}active{% endif %}"
-          >
-            <a
-              href="{% url  'users:create' %}"
-              class="menu-link"
-            >
+          <li class="menu-item {% if '/users/create/' in request.path %}active{% endif %}">
+            <a href="{% url  'users:create' %}" class="menu-link">
               <div class="text-truncate" data-i18n="Add User">
                 Add User
               </div>
@@ -110,8 +99,7 @@
         </ul>
       </li>
 
-      <li
-        class="menu-item {% if '/lessons/' in request.path  or '/lesson_quizzes/' in request.path  %}active open{% endif %}" >
+      <li class="menu-item {% if '/lessons/' in request.path  or '/lesson_quizzes/' in request.path or '/lesson' in request.path  %}active open{% endif %}" >
         <a href="javascript:void(0);" class="menu-link menu-toggle">
           <i class="menu-icon tf-icons bx bx-book-content"></i>
           <div class="text-truncate" data-i18n="Lessons">
@@ -156,9 +144,7 @@
         </ul>
       </li>
 
-      <li
-        class="menu-item {% if '/courses/' in request.path or '/course_quizzes/' in request.path %}active open{% endif %}"
-      >
+      <li class="menu-item {% if '/courses/' in request.path or '/course_quizzes/' in request.path  or '/course' in request.path %}active open{% endif %}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
           <i class="menu-icon tf-icons bx bx-book-alt"></i>
           <div class="text-truncate" data-i18n="Courses">
@@ -166,35 +152,20 @@
           </div>
         </a>
         <ul class="menu-sub">
-          <li
-            class="menu-item {% if '/courses/' in request.path %}active{% endif %}"
-          >
-            <a
-              href="{% url 'courses:index' %}"
-              class="menu-link"
-            >
+          <li class="menu-item {% if '/courses/' in request.path %}active{% endif %}">
+            <a href="{% url 'courses:index' %}" class="menu-link">
               <div class="text-truncate" data-i18n="Courses">Courses</div>
             </a>
           </li>
-          <li
-            class="menu-item {% if '/courses/create/' in request.path %}active{% endif %}"
-          >
-            <a
-              href="{% url 'courses:create' %}"
-              class="menu-link"
-            >
+          <li class="menu-item {% if '/courses/create/' in request.path %}active{% endif %}">
+            <a href="{% url 'courses:create' %}" class="menu-link">
               <div class="text-truncate" data-i18n="Add Course">
                 Add Course
               </div>
             </a>
           </li>
-          <li
-            class="menu-item {% if '/course_quizzes/create/' in request.path %}active{% endif %}"
-          >
-            <a
-              href="{% url 'course_quizzes:create' %}"
-              class="menu-link"
-            >
+          <li class="menu-item {% if '/course_quizzes/create/' in request.path %}active{% endif %}">
+            <a href="{% url 'course_quizzes:create' %}" class="menu-link">
               <div class="text-truncate" data-i18n="Add Course Quiz">
                 Add Course Quiz
               </div>
@@ -203,8 +174,7 @@
         </ul>
       </li>
 
-      <li
-        class="menu-item {% if '/course_topics/' in request.path or '/course_topic_quizzes/' in request.path %}active open{% endif %}">
+      <li class="menu-item {% if '/course_topics/' in request.path or '/course_topic_quizzes/' in request.path  or '/course_topic' in request.path %}active open{% endif %}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
           <i class="menu-icon tf-icons bx bx-objects-vertical-top"></i>
           <div class="text-truncate" data-i18n="Course Topics">
@@ -212,23 +182,13 @@
           </div>
         </a>
         <ul class="menu-sub">
-          <li
-            class="menu-item {% if '/course_topics/' in request.path %}active{% endif %}"
-          >
-            <a
-              href="{% url 'course_topics:index' %}"
-              class="menu-link"
-            >
+          <li class="menu-item {% if '/course_topics/' in request.path %}active{% endif %}">
+            <a href="{% url 'course_topics:index' %}" class="menu-link">
               <div class="text-truncate" data-i18n="Course Topics">Course Topics</div>
             </a>
           </li>
-          <li
-            class="menu-item {% if '/course_topics/create/' in request.path %}active{% endif %}"
-          >
-            <a
-              href="{% url 'course_topics:create' %}"
-              class="menu-link"
-            >
+          <li class="menu-item {% if '/course_topics/create/' in request.path %}active{% endif %}">
+            <a href="{% url 'course_topics:create' %}" class="menu-link">
               <div class="text-truncate" data-i18n="Add Course Topic">
                 Add Course Topic
               </div>
@@ -384,7 +344,7 @@
         </ul>
       </li>
 
-      <li class="menu-item {% if 'admin-profile' == request.resolver_match.url_name or '/user/admin/profile' in request.path %}active{% endif %}">
+      <li class="menu-item {% if 'admin-profile' == request.resolver_match.url_name or '/user/admin/profile' in request.path or '/profile/password-update' in request.path %}active{% endif %}">
         <a href="{% url 'user:admin-profile' %}" class="menu-link">
           <i class="menu-icon tf-icons bx bx-user"></i>
             <div class="text-truncate" data-i18n="Profile">
@@ -410,7 +370,7 @@
       </a>
     </li>
 
-    <li class="menu-item {% if 'courses' == request.resolver_match.url_name or '/user/courses' in request.path %}active{% endif %}">
+    <li class="menu-item {% if 'courses' == request.resolver_match.url_name or '/user/courses' in request.path or '/course' in request.path %}active{% endif %}">
       <a href="{% url 'user:courses' %}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-book-alt"></i>
           <div class="text-truncate" data-i18n="Courses">
@@ -428,7 +388,7 @@
       </a>
     </li>
 
-    <li class="menu-item {% if 'user-profile' == request.resolver_match.url_name or '/user/profile' in request.path %}active{% endif %}">
+    <li class="menu-item {% if 'user-profile' == request.resolver_match.url_name or '/user/profile' in request.path or '/profile/password-update' in request.path %}active{% endif %}">
       <a href="{% url 'user:user-profile' %}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-user"></i>
           <div class="text-truncate" data-i18n="Profile">
