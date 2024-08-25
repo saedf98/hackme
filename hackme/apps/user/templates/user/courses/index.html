@@ -158,8 +158,7 @@
           <div class="col-sm-6 col-lg-4 {% with registered=registered_courses|get_item:course.id %}  {% if registered and registered.completed %} completed {% endif %} {% endwith %}">
             <div class="card p-2 h-100 shadow-none border">
               <div class="rounded-2 text-center mb-3">
-                <a href="app-academy-course-details.html"
-                  ><img
+                <a href="{% url 'user:course-details' course.id %}"><img
                     class="img-fluid"
                     style="height: 164px; width: 266px;"
                     src="{{ course|course_image_url }}"
@@ -266,7 +265,7 @@
           <div class="text-center">No course found.</div>
         {% endfor %}
       </div>
-      {% if not courses %}
+      {% if courses %}
         <nav aria-label="Page navigation" class="d-flex align-items-center justify-content-center">
           <ul class="pagination">
             {% if page_obj.has_previous %}

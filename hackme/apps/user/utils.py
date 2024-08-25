@@ -1,4 +1,4 @@
-
+import math
 from django.shortcuts import redirect
 from apps.courses.models import Course
 from apps.course_topics.models import CourseTopic
@@ -154,3 +154,48 @@ def is_user_in_group(user, group_name):
 def check_course_registration(request, course_id):
     user = request.user
     return UserCourses.objects.filter(user=user, course_id=course_id).exists()
+
+
+def get_course_lessons_and_quizzes(course):
+    lessons = course.lessons.all()
+    quizzes = course.course_topics.filter(course_topic_quizzes__isnull=False)
+    return lessons, quizzes
+
+
+def calculate_user_progress(user, course):
+    lessons, quizzes = get_course_lessons_and_quizzes(course)
+
+    total_items = lessons.count() + quizzes.count()
+    completed_items = 0
+
+    # Check lesson completion
+    for lesson in lessons:
+        if UserLessons.objects.filter(user=user, lesson=lesson, completed=True).exists():
+            completed_items += 1
+
+    # Check quiz completion
+    for quiz in quizzes:
+        if UserCourseTopicQuizzes.objects.filter(user=user, course_topic_quiz=quiz.course_topic_quizzes.first(), completed=True).exists():
+            completed_items += 1
+
+    # Calculate progress percentage
+    if total_items > 0:
+        progress = (completed_items / total_items) * 100
+    else:
+        progress = 0
+
+    print(progress)
+    rounded_progress = min(math.ceil(progress), 100)
+    print(rounded_progress)
+    # Update user course progress
+    user_course, created = UserCourses.objects.get_or_create(
+        user=user, course=course)
+    user_course.progress = rounded_progress
+
+    # Mark course as completed if progress is 100%
+    if progress == 100:
+        user_course.completed = True
+
+    user_course.save()
+
+    return user_course

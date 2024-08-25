@@ -46,7 +46,6 @@ class Course(TimeStampedModel):
         if not self.object_id and self.content_type:
             # Set the object_id to a specific ID based on some logic
             self.object_id = self.get_default_object_id()
-            print(self.object_id)
         super(Course, self).save(*args, **kwargs)
 
     def get_default_object_id(self):

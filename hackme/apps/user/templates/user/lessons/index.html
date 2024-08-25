@@ -64,24 +64,6 @@
               </video>
             </div>
           {% elif lesson.lesson_format == "text" %}
-              <!--TODO: remove this after a while-->
-              {% comment %} <div class="cursor-pointer rounded">
-                <iframe
-                    src="https://www.youtube.com/embed/bTqVqk7FSmY?origin=https://plyr.io&iv_load_policy=3&modestbranding=1&playsinline=1&showinfo=0&rel=0&enablejsapi=1"
-                    frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen
-                    class="w-100"
-                    height="400px"
-                  >
-                </iframe>
-              </div>
-              <div class="cursor-pointer">
-                <video class="w-100"
-                id="plyr-video-player" playsinline controls>
-                <source src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4" type="video/mp4" />
-                </video>
-              </div> {% endcomment %}
               <div class="p-2 mt-2">
                 <h5 class="mb-2">Material</h5>
                 {{lesson.lesson_text }}
@@ -103,6 +85,7 @@
             </div>
           {% else %}
             <div class="cursor-pointer rounded">
+              <h5 class="mb-2">Video Material</h5>
               <iframe
                   src="{{ lesson.lesson_video_link }}?origin=https://plyr.io&iv_load_policy=3&modestbranding=1&playsinline=1&showinfo=0&rel=0&enablejsapi=1"
                   frameborder="0"

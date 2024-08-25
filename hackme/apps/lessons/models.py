@@ -1,7 +1,7 @@
 from django.db import models
 from django.forms import ValidationError
 from django.utils.text import slugify
-from apps.common.utils import estimate_reading_time, is_youtube_url
+from apps.common.utils import estimate_reading_time, is_youtube_url, convert_to_embed_url
 from apps.common.models import LessonFormat, TimeStampedModel
 from apps.courses.models import Course
 from apps.course_topics.models import CourseTopic
@@ -33,9 +33,9 @@ class Lesson(TimeStampedModel):
         db_table = 'lessons'
 
     def clean(self):
-        if not self.lesson_material and not self.lesson_text:
+        if not self.lesson_material and not self.lesson_text and not self.lesson_video_link:
             raise ValidationError(
-                "At least one of Lesson material or Lesson text must be provided.")
+                "At least one of Lesson material or Lesson text or  Lesson video link must be provided.")
 
         if self.lesson_format == LessonFormat.TEXT:
             if not self.lesson_text:
@@ -56,6 +56,9 @@ class Lesson(TimeStampedModel):
             if not is_youtube_url(self.lesson_video_link):
                 raise ValidationError(
                     "Only youtube links are allowed.")
+            else:
+                self.lesson_video_link = convert_to_embed_url(
+                    self.lesson_video_link)
 
         else:
             if not self.lesson_material:
@@ -82,7 +85,6 @@ class Lesson(TimeStampedModel):
 
     @property
     def has_exercise(self):
-        print("I got here")
         return self.exercise.exists()
 
     def __str__(self):

@@ -20,6 +20,9 @@ Here you can override the page view layout.
 Refer to auth/urls.py file for more pages.
 """
 
+# CBV
+# FBV
+
 
 class AuthView(TemplateView):
     # Predefined function
@@ -75,7 +78,6 @@ class LoginAuthView(AuthView):
         user = authenticate(username=username, password=password)
 
         if user is not None:
-            print(user)
             if user.profile.email_verified:
                 login(request, user)
                 # redirect_url = request.GET.get('next', 'home')
@@ -131,7 +133,6 @@ class RegisterAuthView(AuthView):
                 request, f'Thanks for registering {user.username}, Please check your mail inbox to verify your account.',
                 extra_tags='alert alert-success alert-dismissible fade show')
             user_group = Group.objects.get(name='user')
-            print(user_group)
             user.groups.add(user_group)
             redirect_url = reverse('auth:login')
 

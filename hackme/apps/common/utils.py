@@ -1,7 +1,7 @@
 from .crud import CONFIG
 import re
 import math
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
 from django.conf import settings
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth.decorators import user_passes_test
@@ -27,7 +27,6 @@ def get_url(url_name):
 def in_user_group(groups):
     if isinstance(groups, str):
         groups = [groups]  # Convert single group to a list
-        print(format(groups))
 
     def check_group(user):
         return any(user.groups.filter(name=group).exists() for group in groups)
@@ -52,16 +51,29 @@ def is_youtube_url(url):
 
     parsed_url = urlparse(url)
     youtube_patterns = [
-        r'^youtube\.com$',         # www.youtube.com
+        r'^(www\.)?youtube\.com$',  # www.youtube.com or youtube.com
         r'^m\.youtube\.com$',       # m.youtube.com (mobile)
-        r'^youtube\.com$',         # youtube.com (without www)
-        r'^youtu\.be$',            # youtu.be (shortened URLs)
+        r'^youtu\.be$',             # youtu.be (shortened URLs)
     ]
     # Check if the domain matches any of the YouTube patterns
     if any(re.match(pattern, parsed_url.netloc) for pattern in youtube_patterns):
         return True
 
     return False
+
+
+def convert_to_embed_url(youtube_url):
+    parsed_url = urlparse(youtube_url)
+
+    if parsed_url.netloc in ['www.youtube.com', 'youtube.com'] and parsed_url.path.startswith('/embed/'):
+        return youtube_url
+
+    if parsed_url.netloc in ['www.youtube.com', 'youtube.com', 'm.youtube.com'] and parsed_url.path == '/watch':
+        query_params = parse_qs(parsed_url.query)
+        video_id = query_params.get('v')
+        if video_id:
+            return f"https://www.youtube.com/embed/{video_id[0]}"
+    return None  # If the URL is not a valid YouTube video link
 
 
 def convert_minutes(duration_minutes):

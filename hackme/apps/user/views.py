@@ -14,6 +14,7 @@ from apps.levels.models import Level
 from apps.courses.models import Course
 from django.views.generic import ListView
 from apps.exercises.models import Exercise
+from apps.common.models import CourseStatus
 from apps.course_topics.models import CourseTopic
 from django.contrib.contenttypes.models import ContentType
 from apps.common.mixins import CourseRegistrationRequiredMixin
@@ -21,7 +22,7 @@ from apps.common.views import UserDashboardView, DashboardView
 from apps.course_topic_quizzes.models import CourseTopicQuiz
 from .forms import LessonExerciseForm, UserProfileUpdateForm, UserPasswordChangeForm
 from apps.user_progress.models import UserCourses, UserExercises, UserCourseTopics, UserLessons, UserCourseQuizzes, UserCourseTopicQuizzes, UserLessonQuizzes
-from .utils import create_user_exercise, create_user_lesson, get_completed_lessons_count, get_user_lesson_dict, get_registered_courses, count_users_registered_for_course, format_number, get_user_course_topic_quizzes, get_courses_total_duration, get_user_courses, get_user_courses_dict, check_course_registration
+from .utils import create_user_exercise, create_user_lesson, get_completed_lessons_count, get_user_lesson_dict, get_registered_courses, count_users_registered_for_course, format_number, get_user_course_topic_quizzes, get_courses_total_duration, get_user_courses, get_user_courses_dict, check_course_registration, calculate_user_progress
 
 
 # Create your views here.
@@ -230,7 +231,6 @@ class UserCoursesView(UserDashboardView, ListView):
         level_param = self.request.GET.get('level', None)
         if filter_param:
             app_label, model_name = filter_param.split('.')
-            print(app_label, model_name)
             course_content_types = ContentType.objects.filter(
                 app_label=app_label, model=model_name)
             queryset = queryset.filter(content_type__in=course_content_types)
@@ -241,7 +241,7 @@ class UserCoursesView(UserDashboardView, ListView):
             )
         if level_param:
             queryset = queryset.filter(level=level_param)
-
+        queryset = queryset.filter(course_status=CourseStatus.PUBLISHED)
         return queryset
 
     def get(self, request, *args, **kwargs):
@@ -270,7 +270,6 @@ class UserCoursesView(UserDashboardView, ListView):
         search_param = self.request.GET.get('search', '')
         level_param = self.request.GET.get('level', 0)
         level_name = Level.objects.filter(id=level_param).first()
-        print(self.object_list)
 
         context.update({
             "additional_data": "This is some additional data for MyView",
@@ -344,7 +343,6 @@ class UserMyCoursesView(UserDashboardView, ListView):
         level_param = self.request.GET.get('level', None)
         if filter_param:
             app_label, model_name = filter_param.split('.')
-            print(app_label, model_name)
             course_content_types = ContentType.objects.filter(
                 app_label=app_label, model=model_name)
             registered_courses = registered_courses.filter(
@@ -386,7 +384,6 @@ class UserMyCoursesView(UserDashboardView, ListView):
         level_param = self.request.GET.get('level', 0)
         level_name = Level.objects.filter(id=level_param).first()
         level_name = level_name.name if level_name else None
-        print(self.object_list)
 
         context.update({
             "additional_data": "This is some additional data for MyView",
@@ -500,7 +497,6 @@ class UserCourseDetailsView(CourseRegistrationRequiredMixin, UserCourseTopicsVie
         completed_lessons_count = get_completed_lessons_count(
             self.request.user, course_id)
         user_lesson_dict = get_user_lesson_dict(self.request.user)
-        print(check_course_registration(self.request, course_id))
         context.update({
             "user_lesson_dict": user_lesson_dict,
             'completed_lessons_count': completed_lessons_count,
@@ -519,9 +515,10 @@ class UserLessonView(CourseRegistrationRequiredMixin, UserCourseTopicsView):
         course_topic_id = self.kwargs.get('course_topic_id')
         lesson_id = self.kwargs.get('lesson_id')
         lesson = Lesson.objects.get(pk=lesson_id)
-        exercise = Exercise.objects.get(
-            lesson=lesson_id,
-            course=course_id)
+        try:
+            exercise = Exercise.objects.get(lesson=lesson_id, course=course_id)
+        except Exercise.DoesNotExist:
+            exercise = None
         user_course_topic_quizzes = get_user_course_topic_quizzes(
             self.request.user,
             course_id,
@@ -622,6 +619,11 @@ class UserExerciseView(CourseRegistrationRequiredMixin, UserCourseTopicsView):
                     completed=True
                 )
 
+                updated_progress = calculate_user_progress(
+                    request.user, exercise.course)
+
+                print(updated_progress)
+
                 if lesson_created and exercise_created:
                     messages.success(
                         request,
@@ -682,11 +684,11 @@ class UserCourseTopicQuizzesView(CourseRegistrationRequiredMixin, UserCourseTopi
 
 
 class SubmitUserCourseTopicQuizzesView(UserCourseTopicsView):
+
     def post(self, request, *args, **kwargs):
 
         try:
             data = json.loads(request.body)
-            # print(data)
         except json.JSONDecodeError:
             return JsonResponse({"status": "error", "message": "Invalid JSON format"}, status=400)
 
