@@ -184,9 +184,8 @@ def calculate_user_progress(user, course):
     else:
         progress = 0
 
-    print(progress)
     rounded_progress = min(math.ceil(progress), 100)
-    print(rounded_progress)
+
     # Update user course progress
     user_course, created = UserCourses.objects.get_or_create(
         user=user, course=course)
@@ -199,3 +198,13 @@ def calculate_user_progress(user, course):
     user_course.save()
 
     return user_course
+
+
+def get_latest_incomplete_course(user):
+    # Get the user's latest course that is not completed
+    latest_incomplete_course = UserCourses.objects.filter(
+        user=user,
+        completed=False
+    ).order_by('-created_at').first()  # Assuming there's a date_registered field
+
+    return latest_incomplete_course

@@ -92,9 +92,7 @@
   </div>
 
   <div class="card mb-4">
-    <div
-      class="card-header d-flex flex-wrap justify-content-between gap-3"
-    >
+    <div class="card-header d-flex flex-wrap justify-content-between gap-3">
     <input type="hidden" name="level_param" id="level_param" value="{{ level_param }}">
     <input type="hidden" name="search_param" id="search_param" value="{{ search_param }}">
     <input type="hidden" name="filter_param" id="filter_param" value="{{ filter_param }}">
@@ -105,9 +103,7 @@
           Total {{course_count}} courses are available
         </p>
       </div>
-      <div
-        class="d-flex justify-content-md-end align-items-center gap-3 flex-wrap"
-      >
+      <div class="d-flex justify-content-md-end align-items-center gap-3 flex-wrap">
           <select
           id="select2_level_select"
           class="select2 form-select"
@@ -273,7 +269,7 @@
                 <a class="page-link" href="?page=1">First</a>
               </li>
               <li class="page-item prev">
-                <a class="page-link" href="javascript:void(0);"
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}"
                   ><i
                     class="ti ti-chevron-left ti-xs scaleX-n1-rtl"
                   ></i

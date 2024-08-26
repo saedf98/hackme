@@ -1,18 +1,19 @@
 import json
 from django.db.models import Q
-from django.http import JsonResponse
+from django.db.models import Sum
 from django.urls import reverse
 from django.db import transaction
+from django.db.models import Count
 from django.contrib import messages
+from django.http import JsonResponse
 from django.urls import reverse_lazy
-from django.shortcuts import redirect
+from django.views.generic import ListView
 from django.shortcuts import get_object_or_404, redirect
 
 from apps.users.models import User, UserProfile
 from apps.lessons.models import Lesson
 from apps.levels.models import Level
 from apps.courses.models import Course
-from django.views.generic import ListView
 from apps.exercises.models import Exercise
 from apps.common.models import CourseStatus
 from apps.course_topics.models import CourseTopic
@@ -22,7 +23,7 @@ from apps.common.views import UserDashboardView, DashboardView
 from apps.course_topic_quizzes.models import CourseTopicQuiz
 from .forms import LessonExerciseForm, UserProfileUpdateForm, UserPasswordChangeForm
 from apps.user_progress.models import UserCourses, UserExercises, UserCourseTopics, UserLessons, UserCourseQuizzes, UserCourseTopicQuizzes, UserLessonQuizzes
-from .utils import create_user_exercise, create_user_lesson, get_completed_lessons_count, get_user_lesson_dict, get_registered_courses, count_users_registered_for_course, format_number, get_user_course_topic_quizzes, get_courses_total_duration, get_user_courses, get_user_courses_dict, check_course_registration, calculate_user_progress
+from .utils import create_user_exercise, create_user_lesson, get_completed_lessons_count, get_user_lesson_dict, get_registered_courses, count_users_registered_for_course, format_number, get_user_course_topic_quizzes, get_courses_total_duration, get_user_courses, get_user_courses_dict, check_course_registration, calculate_user_progress, get_latest_incomplete_course
 
 
 # Create your views here.
@@ -208,11 +209,54 @@ class AdminProfileView(DashboardView):
 
 class UserAcademicDashboardView(UserDashboardView):
     def get_context_data(self, **kwargs):
+        user = self.request.user
         context = super().get_context_data(**kwargs)
+        recent_lessons = UserLessons.objects.filter(
+            user=user).order_by('-updated_at')[:2]
+        recent_quizzes = UserCourseTopicQuizzes.objects.filter(
+            user=user).order_by('-updated_at')[:2]
+        recent_exercises = UserExercises.objects.filter(
+            user=user).order_by('-updated_at')[:2]
 
-        # Add more data to the context specific to this view
+       # Fetch unique courses with highest user count
+        recommended_courses = UserCourses.objects.exclude(user=user).values('course_id').annotate(
+            user_count=Count('user')
+        ).order_by('-user_count').distinct()[:5]
+
+        # Fetch full course objects for the unique course_ids
+        unique_course_ids = [item['course_id'] for item in recommended_courses]
+        recommended_courses = Course.objects.filter(id__in=unique_course_ids)
+
+        popular_courses = UserCourses.objects.select_related('course').values('course_id', 'course__name', 'course__description').annotate(
+            user_count=Count('user')
+        ).order_by('-user_count')[:5]
+
+        # Leaderboard
+        leaderboard = UserLessons.objects.select_related('user', 'user__profile').values(
+            'user_id', 'user__profile__profile_picture', 'user__username').annotate(total_progress=Sum('progress') / 100).order_by('-total_progress')[:10]
+
+        # Fetch total time spent by the current user
+        total_time_spent = UserLessons.objects.filter(user=user, completed=True).aggregate(
+            total_duration=Sum('lesson__duration')
+        )
+
+        # Get the total duration in minutes
+        total_time_spent_in_minutes = total_time_spent[
+            'total_duration'] if total_time_spent['total_duration'] else 0
+
+        total_courses_completed = UserCourses.objects.filter(
+            user=user, completed=True).count()
+
         context.update({
-            "additional_data": "This is some additional data for MyView",
+            'recent_lessons': recent_lessons,
+            'recent_quizzes': recent_quizzes,
+            'recent_exercises': recent_exercises,
+            'recommended_courses': recommended_courses,
+            'popular_courses': popular_courses,
+            'leaderboard': leaderboard,
+            "latest_incomplete_course": get_latest_incomplete_course(user),
+            "total_time_spent_in_minutes": total_time_spent_in_minutes,
+            "total_courses_completed": total_courses_completed
         })
 
         return context
@@ -221,7 +265,7 @@ class UserAcademicDashboardView(UserDashboardView):
 class UserCoursesView(UserDashboardView, ListView):
     model = Course
     context_object_name = 'courses'
-    paginate_by = 10  # Number of items per page
+    paginate_by = 6  # Number of items per page
 
     def get_queryset(self):
         queryset = super().get_queryset()
