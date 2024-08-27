@@ -222,3 +222,15 @@ def transform_label(value):
     except ValueError:
         # Return the original value if splitting or transformation fails
         return value
+
+
+@register.filter
+def format_number(num):
+    """
+    Formats a number to include 'k' for thousands and 'm' for millions.
+    """
+    if num >= 1_000_000:
+        return f'{num / 1_000_000:.2f}m'
+    elif num >= 1000:
+        return f'{num / 1000:.2f}k'
+    return str(num)
