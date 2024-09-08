@@ -17,7 +17,6 @@
 
   <div class="menu-inner-shadow"></div>
 
-  <!--TODO(toheeb): look into the dashboard and fix this for different user roles -->
   <ul class="menu-inner py-1">
 
     {% comment %} {{request.path}} {% endcomment %}
@@ -71,28 +70,31 @@
         </ul>
       </li>
 
-      <li class="menu-item {% if '/users/' in request.path %}active open{% endif %}">
-        <a href="javascript:void(0);" class="menu-link menu-toggle">
-          <i class="menu-icon tf-icons bx bx-group"></i>
-          <div class="text-truncate" data-i18n="Users">
-            Users
-          </div>
-        </a>
-        <ul class="menu-sub">
-          <li class="menu-item {% if '/users/' in request.path %}active{% endif %}">
-            <a href="{% url 'users:index' %}" class="menu-link">
-              <div class="text-truncate" data-i18n="Users">Users</div>
-            </a>
-          </li>
-          <li class="menu-item {% if '/users/create/' in request.path %}active{% endif %}">
-            <a href="{% url  'users:create' %}" class="menu-link">
-              <div class="text-truncate" data-i18n="Add User">
-                Add User
-              </div>
-            </a>
-          </li>
-        </ul>
-      </li>
+      <!--TODO(toheeb): look into the dashboard and fix this for different user roles -->
+      {% if request.user.is_staff %}
+        <li class="menu-item {% if '/users/' in request.path %}active open{% endif %}">
+          <a href="javascript:void(0);" class="menu-link menu-toggle">
+            <i class="menu-icon tf-icons bx bx-group"></i>
+            <div class="text-truncate" data-i18n="Users">
+              Users
+            </div>
+          </a>
+          <ul class="menu-sub">
+            <li class="menu-item {% if '/users/' in request.path %}active{% endif %}">
+              <a href="{% url 'users:index' %}" class="menu-link">
+                <div class="text-truncate" data-i18n="Users">Users</div>
+              </a>
+            </li>
+            <li class="menu-item {% if '/users/create/' in request.path %}active{% endif %}">
+              <a href="{% url  'users:create' %}" class="menu-link">
+                <div class="text-truncate" data-i18n="Add User">
+                  Add User
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+      {% endif %}
 
       <li class="menu-item {% if '/lessons/' in request.path  or '/lesson_quizzes/' in request.path or '/lesson' in request.path  %}active open{% endif %}" >
         <a href="javascript:void(0);" class="menu-link menu-toggle">

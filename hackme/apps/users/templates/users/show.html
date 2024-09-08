@@ -49,6 +49,10 @@ href="{% static 'vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.
   <span class="text-muted fw-light">{{ 'users.name'|get_config }} /</span> {{ 'users.show_title'|get_config }}
 </h4>
 
-<h1>Show here</h1>
+<div class="row">
+  <div class="col-12">
+    {% include 'common/user-details-card.html' %}
+  </div>
+</div>
 
 {% endblock %}

@@ -1,7 +1,8 @@
 from django.urls import reverse_lazy
-from django.utils.decorators import method_decorator
+# from django.utils.decorators import method_decorator
+from django.shortcuts import get_object_or_404
 from apps.common.views import DashboardView
-from apps.common.utils import in_user_group
+# from apps.common.utils import in_user_group
 from .models import User
 from .tables import UserTable
 
@@ -22,3 +23,16 @@ class UserView(DashboardView, UserTable):
         })
 
         return context
+
+
+class UserShowView(DashboardView):
+    model = User
+
+    def get(self, request, id, *args, **kwargs):
+        user = get_object_or_404(User, id=id)
+        context = self.get_context_data()
+        context.update({
+            "curr_user": user,
+            "curr_user_role": user.groups.all()[0].name
+        })
+        return self.render_to_response(context)

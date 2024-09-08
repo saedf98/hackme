@@ -1,0 +1,61 @@
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="card-title m-0">User Details </h5>
+  </div>
+  <div class="card-datatable table-responsive pt-2 pb-3">
+    <table class="table table-striped text-nowrap table-bordered">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="fw-semibold" style="width: 7rem;">Username:</td>
+          <td class="text-wrap"> {{ curr_user.username }}</td>
+        </tr>
+        <tr>
+          <td class="fw-semibold" style="width: 7rem;">Firstname:</td>
+          <td class="text-wrap"> {{ curr_user.first_name }}</td>
+        </tr>
+        <tr>
+          <td class="fw-semibold" style="width: 7rem;">Lastname:</td>
+          <td class="text-wrap"> {{ curr_user.last_name }}</td>
+        </tr>
+        <tr>
+          <td class="fw-semibold" style="width: 7rem;">Email:</td>
+          <td class="text-wrap"> {{ curr_user.email }}</td>
+        </tr>
+        <tr>
+          <td class="fw-semibold" style="width: 7rem;">Active Status:</td>
+          <td class="text-wrap"> {{ curr_user.is_active }}</td>
+        </tr>
+        <tr>
+          <td class="fw-semibold" style="width: 7rem;"> Is Admin:</td>
+          <td class="text-wrap"> {{ curr_user.is_staff }}</td>
+        </tr>
+        <tr>
+          <td class="fw-semibold" style="width: 7rem;">Role:</td>
+          <td class="text-wrap"> {{ curr_user_role|capitalize_first }}</td>
+        </tr>
+        <tr>
+          <td class="fw-semibold" style="width: 7rem;">Title:</td>
+          <td class="text-wrap"> {{ curr_user.profile.title }}</td>
+        </tr>
+        <tr>
+          <td class="fw-semibold" style="width: 7rem;">Profile Picture:</td>
+          <td class="text-wrap">
+            <div class="avatar">
+              <img
+                src="{{ curr_user|profile_picture_url }}"
+                alt
+                class="w-px-40 h-auto rounded-circle"
+              />
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

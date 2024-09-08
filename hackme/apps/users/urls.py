@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserView
+from .views import UserView, UserShowView
 
 app_name = "users"
 
@@ -21,7 +21,7 @@ urlpatterns = [
     ),
     path(
         "users/show/<int:id>/",
-        UserView.as_view(template_name="users/show.html"),
+        UserShowView.as_view(template_name="users/show.html"),
         name="show",
     ),
 ]

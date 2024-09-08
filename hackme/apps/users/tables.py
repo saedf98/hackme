@@ -18,7 +18,7 @@ class UserTable(Table):
     action = LinkColumn(header='Action',
                         links=[
                             # Link(text='Edit', viewname='levels:edit', args=(A('id'),)),
-                               Link(text='View', viewname='levels:show', args=(A('id'),))],
+                               Link(text='View', viewname='users:show', args=(A('id'),))],
                         delimiter=" | ")
 
     class Meta:
