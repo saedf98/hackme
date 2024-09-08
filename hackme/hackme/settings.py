@@ -52,7 +52,7 @@ ENVIRONMENT = os.environ.get("DJANGO_ENVIRONMENT", default="local")
 # Application definition
 
 INSTALLED_APPS = [
-    'django_extensions',
+    # 'django_extensions',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

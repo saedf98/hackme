@@ -12,7 +12,7 @@ class Level(TimeStampedModel):
         db_table = 'levels'
 
     def save(self, *args, **kwargs):
-        if not self.slug:
+        if not self.slug or self.slug != slugify(self.name):
             self.slug = slugify(self.name)
         super(Level, self).save(*args, **kwargs)
 

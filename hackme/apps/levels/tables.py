@@ -13,7 +13,9 @@ class LevelTable(Table):
                   searchable=False, attrs={'class': "user-name"})
     action = LinkColumn(header='Action',
                         links=[Link(text='Edit', viewname='levels:edit', args=(A('id'),)),
-                               Link(text='View', viewname='levels:show', args=(A('id'),))],
+                               Link(text='View', viewname='levels:show',
+                                    args=(A('id'),)),
+                               Link(text='Delete', viewname='levels:delete', args=(A('id'),), attrs={'onclick': "if(!confirm('Are you sure You want to delete this?')) return false"})],
                         delimiter=" | ")
 
     class Meta:

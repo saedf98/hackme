@@ -18,6 +18,7 @@ CONFIG = {
         'are_you_sure': 'Are you sure?',
         'no_items_found': 'No items found',
         'created': 'Successfully created',
+        'form_invalid': '❌ Please fill all compulsory fields!',
         'saved': 'Saved successfully',
         'removed': 'Successfully removed',
         'something_wrong': 'Something went wrong, Please try again later',

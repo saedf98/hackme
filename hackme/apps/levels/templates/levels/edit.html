@@ -49,6 +49,33 @@ href="{% static 'vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.
   <span class="text-muted fw-light">{{ 'levels.name'|get_config }} /</span> {{ 'levels.edit_title'|get_config }}
 </h4>
 
-<h1>Edit here</h1>
-
+<div class="row">
+  <div class="col-12">
+      <div class="card">
+          <h5 class="card-header"> {{ 'levels.edit_title'|get_config }} </h5>
+          <div class="card-body">
+            {% if messages %}
+              <div class="messages mx-3">
+                {% for message in messages %}
+                <div {% if message.tags %} class="{{ message.tags }}" {% endif %}
+                  role="alert">
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"
+                    aria-label="Close"
+                  ></button>
+                  {{ message|escape }}
+                </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+            <form method="POST" action="{% url 'levels:edit' form.instance.pk %}" class="row g-3">
+              {% csrf_token %}
+              {% include './form-inputs.html' %}
+              <div class="col-12">
+                <button type="submit" class="btn btn-primary">{{ _('Update') }}</button>
+              </div>
+            </form>
+          </div>
+      </div>
+  </div>
+</div>
 {% endblock %}
