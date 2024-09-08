@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserProfileView, AdminProfileView, UserCoursesView, UserMyCoursesView, UserCourseDetailsView, UserLessonView, UserExerciseView, UserAcademicDashboardView, UserCourseTopicQuizzesView, SubmitUserCourseTopicQuizzesView, UserRegisterCourseView, PasswordUpdateView
+from .views import UserProfileView, AdminProfileView, UserCoursesView, UserMyCoursesView, UserCourseDetailsView, UserLessonView, UserExerciseView, UserAcademicDashboardView, UserCourseTopicQuizzesView, SubmitUserCourseTopicQuizzesView, UserRegisterCourseView, PasswordUpdateView, AdminPasswordUpdateView
 
 app_name = "user"
 
@@ -75,6 +75,12 @@ urlpatterns = [
         "user/admin/profile",
         AdminProfileView.as_view(template_name="user/profile/index.html"),
         name="admin-profile",
+    ),
+    path(
+        "user/admin/profile/password-update",
+        AdminPasswordUpdateView.as_view(
+            template_name="user/profile/index.html"),
+        name="admin-password-update",
     ),
     path(
         "user/course-topic-quiz/submit",

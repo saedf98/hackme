@@ -23,7 +23,7 @@
     <div class="card mb-4">
       <h5 class="card-header">Profile Details</h5>
       <!-- Account -->
-      <form id="formAccountSettings" action="{% url 'user:user-profile' %}" method="POST" enctype="multipart/form-data">
+      <form id="formAccountSettings" action="{% if user.is_staff or request.user|in_user_group:"instructor" %} {% url 'user:admin-profile' %} {% else %} {% url 'user:user-profile' %} {% endif %}" method="POST" enctype="multipart/form-data">
       {% csrf_token %}
       <div class="card-body">
         <div class="d-flex align-items-start align-items-sm-center gap-4">
@@ -113,7 +113,8 @@
             </div>
           {% endif %}
         {% endif %}
-        <form id="formAccountDeactivation" action="{% url 'user:password-update'  %}" method="POST">
+
+        <form id="formAccountDeactivation" action="{% if user.is_staff or request.user|in_user_group:"instructor" %} {% url 'user:admin-password-update' %} {% else %} {% url 'user:password-update'  %} {% endif %}" method="POST">
           {% csrf_token %}
           <input type="hidden" name="form" value="password-update">
           <div class="mb-3 col-12">

@@ -201,10 +201,112 @@ class AdminProfileView(DashboardView):
 
         # Add more data to the context specific to this view
         context.update({
-            "additional_data": "This is some additional data for MyView",
+            "profile_update": "profile_update",
+        })
+        return context
+
+    def post(self, request, *args, **kwargs):
+        redirect_url = request.META.get('HTTP_REFERER', '/')
+        redirect_url = 'user:admin-profile'
+        profile_update_form = UserProfileUpdateForm(
+            request.POST, request.FILES)
+        if profile_update_form.is_valid():
+            error = False
+            first_name = profile_update_form.cleaned_data['first_name']
+            last_name = profile_update_form.cleaned_data['last_name']
+            email = profile_update_form.cleaned_data['email']
+            username = profile_update_form.cleaned_data['username']
+            title = profile_update_form.cleaned_data['title']
+            profile_picture = profile_update_form.cleaned_data['profile_picture']
+
+            user = User.objects.get(id=self.request.user.id)
+            user.first_name = first_name
+            user.last_name = last_name
+            if email != user.email:
+                error = True
+                messages.error(
+                    request,
+                    "❌ Email can't be updated",
+                    extra_tags='alert alert-danger alert-dismissible fade show')
+            if username and username != user.username:
+                if User.objects.filter(username=username).exists():
+                    error = True
+                    messages.error(
+                        request,
+                        "❌ Username not available, please select another username!",
+                        extra_tags='alert alert-danger alert-dismissible fade show')
+            user_profile, created = UserProfile.objects.get_or_create(
+                user=user)
+
+            if title:
+                user_profile.title = title
+            if profile_picture:
+                user_profile.profile_picture = profile_picture
+
+            if not error:
+                user.save()
+                user_profile.save()
+                messages.success(
+                    request,
+                    " ✅ Profile Updated successfully!",
+                    extra_tags='alert alert-success alert-dismissible fade show')
+                return redirect(redirect_url)
+        messages.error(
+            request, "❌ Please fill all compulsory fields!",
+            extra_tags='alert alert-danger alert-dismissible fade show')
+        self.get_context_data(profile_update_form=profile_update_form)
+        return redirect(redirect_url)
+
+
+class AdminPasswordUpdateView(DashboardView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Add more data to the context specific to this view
+        context.update({
+            "password_update": "password_update"
         })
 
         return context
+
+    def post(self, request, *args, **kwargs):
+        redirect_url = request.META.get('HTTP_REFERER', '/')
+        redirect_url = 'user:admin-password-update'
+        password_update_form = UserPasswordChangeForm(request.POST)
+        if password_update_form.is_valid():
+            user = request.user
+            error = False
+            old_password = password_update_form.cleaned_data.get(
+                'old_password')
+            new_password = password_update_form.cleaned_data.get(
+                'new_password')
+            new_password_confirmation = password_update_form.cleaned_data.get(
+                'new_password_confirmation')
+            if new_password and new_password_confirmation and new_password != new_password_confirmation:
+                error = True
+                messages.error(
+                    request,
+                    "❌ Password confirmation incorrect!",
+                    extra_tags='alert alert-danger alert-dismissible fade show')
+            if not user.check_password(old_password):
+                error = True
+                messages.error(
+                    request,
+                    "❌ Your current password was entered incorrectly. Please enter it again!",
+                    extra_tags='alert alert-danger alert-dismissible fade show')
+            if not error:
+                user.set_password(new_password)
+                user.save()
+                messages.success(
+                    request,
+                    " ✅ Password Updated successfully!",
+                    extra_tags='alert alert-success alert-dismissible fade show')
+                return redirect(redirect_url)
+        messages.error(
+            request, "❌ Please fill all compulsory fields!",
+            extra_tags='alert alert-danger alert-dismissible fade show')
+        self.get_context_data(password_update_form=password_update_form)
+        return redirect(redirect_url)
 
 
 class UserAcademicDashboardView(UserDashboardView):
